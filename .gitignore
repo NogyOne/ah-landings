@@ -1,0 +1,14 @@
+# Local AI runtime state
+.atl/
+
+# codegraph
+.codegraph/
+/.codegraph/
+
+# misc
+.DS_Store
+._*
+*.pem
+
+#Impeccable
+.impeccable/
