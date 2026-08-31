@@ -11,7 +11,7 @@ The project is about a landing page for a Jewelry Store with the goal of give in
 | Runtime        | Node.js `>=22.12.0`                                                             |
 | TypeScript     | Astro strict configuration                                                      |
 | Rendering      | Astro default static output; no server adapter or output override               |
-| Implementation | Minimal starter page in `src/pages/index.astro`                                 |
+| Implementation | Verified desktop Navbar/Hero/Jewelry slice with reusable `SectionContainer` in `src/layouts/`, `src/components/site/`, `src/components/ui/`, `src/components/sections/`, and `src/pages/index.astro` |
 | Design intent  | Accepted direction in `docs/design-brief.md`, not proof of implemented behavior |
 
 For version-sensitive Astro, Tailwind, or integration APIs, consult
@@ -35,6 +35,10 @@ Do not claim or run `astro check`: `@astrojs/check` and TypeScript are not decla
 ## Ownership
 
 - `src/` and `public/` own application behavior and assets.
+- `src/layouts/` owns Astro page/document shells.
+- `src/components/site/` owns persistent Halisco brand/site chrome.
+- `src/components/ui/` owns reusable visual/layout primitives.
+- `src/components/sections/` owns page-specific sections.
 - `docs/architecture.md` describes verified implementation structure.
 - `docs/design-brief.md` owns accepted product and visual intent.
 - Root `../../docs/` owns workspace-wide topology and conventions.

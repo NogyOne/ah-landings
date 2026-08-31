@@ -1,0 +1,103 @@
+---
+import { Image } from "astro:assets";
+import jewelryChainMain from "@assets/images/jewelry-chain-main.webp";
+import jewelryProducts from "@assets/images/jewelry-products.webp";
+import jewelryModel from "@assets/images/jewelry-model.webp";
+import SectionContainer from "@ui/SectionContainer.astro";
+---
+
+<SectionContainer
+  id="jewelry"
+  aria-labelledby="jewelry-title"
+  class="isolate overflow-hidden bg-theme-surface py-24"
+>
+  <div
+    slot="background"
+    class="mt-10 pointer-events-none absolute inset-y-0 right-0 z-0 w-3/4 bg-[linear-gradient(to_right,color-mix(in_srgb,var(--color-theme-divider)_16%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_srgb,var(--color-theme-divider)_16%,transparent)_1px,transparent_1px)] bg-size-[3rem_2rem] mask-[radial-gradient(ellipse_75%_70%_at_65%_50%,black_35%,transparent_100%)] [-webkit-mask-image:radial-gradient(ellipse_75%_70%_at_65%_50%,black_35%,transparent_100%)] after:absolute after:inset-x-0 after:top-0 after:h-12 after:bg-linear-to-b after:from-theme-surface after:to-transparent after:content-['']"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="relative z-10 grid grid-cols-12 gap-x-16 gap-y-20">
+    <header class="col-span-7">
+      <p
+        class="mb-4 font-body text-xs font-light tracking-[4px] text-theme-accent"
+      >
+        JOYERÍA
+      </p>
+      <h2
+        id="jewelry-title"
+        class="m-0 max-w-3xl font-display text-5xl font-medium leading-[1.08] tracking-tight text-theme-foreground"
+      >
+        Encuentra una pieza que se vuelva parte de tu historia
+      </h2>
+    </header>
+
+    <div class="col-span-5 pt-8">
+      <p
+        class="m-0 max-w-xl font-body text-lg font-normal leading-[1.6] text-theme-muted"
+      >
+        Explora nuestro aparador de piezas importadas, nacionales e italianas en
+        oro y plata. Diseños disponibles para llevar, elegir con calma y
+        acompañar tanto lo cotidiano como las ocasiones que merecen recordarse.
+      </p>
+      <p
+        class="m-0 mt-6 font-body text-xs font-light leading-5 tracking-[4px] text-theme-accent"
+      >
+        ORO Y PLATA · PIEZAS PARA USO DIARIO Y OCASIONES ESPECIALES
+      </p>
+    </div>
+
+    <div class="col-span-12 grid grid-cols-12 items-start gap-x-16">
+      <figure class="col-span-7 m-0 aspect-2/3 overflow-hidden">
+        <Image
+          src={jewelryChainMain}
+          alt="Cadena dorada dispuesta sobre un fondo oscuro en una composición de joyería."
+          width={736}
+          height={1104}
+          densities={[1, 2]}
+          quality={82}
+          fit="cover"
+          position="center"
+          class="h-full w-full object-cover object-center"
+        />
+      </figure>
+
+      <div class="col-span-5 grid gap-10">
+        <div>
+          <figure class="m-0 aspect-3/2 w-full overflow-hidden">
+            <Image
+              src={jewelryProducts}
+              alt="Selección de joyas doradas presentada en un aparador."
+              width={560}
+              height={374}
+              densities={[1, 2]}
+              quality={82}
+              fit="cover"
+              position="center"
+              class="h-full w-full object-cover object-center"
+            />
+          </figure>
+          <span class="mt-4 block h-px w-45 bg-theme-accent" aria-hidden="true"
+          ></span>
+        </div>
+
+        <figure
+          class="m-0 aspect-square w-3/4 justify-self-end overflow-hidden"
+        >
+          <Image
+            src={jewelryModel}
+            alt="Persona luciendo una cadena dorada sobre una camisa blanca."
+            width={360}
+            height={360}
+            densities={[1, 2]}
+            quality={85}
+            fit="cover"
+            position="center"
+            class="h-full w-full object-cover object-center"
+          />
+        </figure>
+      </div>
+    </div>
+  </div>
+</SectionContainer>
