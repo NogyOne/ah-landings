@@ -1,0 +1,37 @@
+---
+import Navbar from "@site/Navbar.astro";
+import "@styles/global.css";
+
+interface Props {
+	 title: string;
+	 description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#0B0B0A" />
+		<title>{title}</title>
+	</head>
+	<body>
+		<!--
+			THESIS: A cinematic, editorial first viewport makes Halisco's jewelry and craft feel tangible while refusing the catalog landing-page default.
+			OWN-WORLD: Deep ink, warm ivory, restrained gold, photographic shadow, Playfair Display headlines, and tracked Inter controls create a quiet workshop after dark.
+			STORY: Visitors recognize a local jeweler, understand the offer, and choose between an in-person visit and a WhatsApp conversation.
+			FIRST VIEWPORT: A 1440x960 full-bleed bride image carries a left-weighted copy block at desktop scale; the primary action sits beneath the promise and the navigation overlays the image.
+			FORM: Approved OpenPencil Halisco V2 desktop composition from halisco-mockups Page 1, nodes 0:217 and 0:230; no new visual-direction roll is introduced in this bounded implementation slice.
+			FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+		-->
+		<Navbar />
+		<slot />
+	</body>
+</html>

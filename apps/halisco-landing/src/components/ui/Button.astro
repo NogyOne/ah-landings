@@ -1,0 +1,26 @@
+---
+const buttonVariants = {
+  primary:
+    "bg-theme-accent text-theme-on-accent hover:bg-theme-foreground hover:text-theme-on-accent",
+  secondary:
+    "border-[0.5px] border-theme-accent bg-transparent hover:border-theme-foreground hover:bg-theme-foreground hover:text-theme-on-accent",
+} as const;
+
+type Variant = keyof typeof buttonVariants;
+
+interface Props {
+  label: string;
+  href: string;
+  variant?: Variant;
+}
+
+const { label, href, variant = "primary" } = Astro.props;
+---
+
+<a
+  class:list={[
+    "inline-flex h-12 items-center justify-center px-5 font-body text-xs font-light tracking-widest whitespace-nowrap text-center transition-colors duration-300",
+    buttonVariants[variant],
+  ]}
+  href={href}>{label}</a
+>

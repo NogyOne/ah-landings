@@ -1,0 +1,51 @@
+---
+import { Image } from "astro:assets";
+import logo from "@assets/images/logo-nbg.webp";
+
+const links = [
+  { label: "JOYERÍA", href: "#jewelry" },
+  { label: "HECHURAS", href: "#hechuras" },
+  { label: "REPARACIONES", href: "#repairs" },
+  { label: "RELOJERÍA", href: "#watchmaking" },
+  { label: "PREGUNTAS", href: "#questions" },
+];
+---
+
+<nav
+  class="absolute inset-x-0 top-0 z-10 h-18 border-b border-theme-divider/55 bg-theme-on-accent/30 backdrop-blur-lg"
+  aria-label="Navegación principal"
+>
+  <div class="flex h-full items-center pl-60 pr-24">
+    <a
+      class="flex h-12 w-30 flex-none items-center overflow-hidden"
+      href="#hero"
+      aria-label="Halisco Joyería, inicio"
+    >
+      <Image
+        src={logo}
+        width={120}
+        height={120}
+        densities={[1, 2]}
+        quality={90}
+        alt=""
+        loading="eager"
+        class="max-w-none h-30 w-30 object-contain"
+      />
+    </a>
+
+    <ul class="m-0 ml-auto flex list-none items-center gap-7 p-0">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              class="inline-flex items-center font-body text-sm font-normal leading-5 tracking-widest whitespace-nowrap text-theme-foreground hover:text-theme-accent"
+              href={link.href}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>
