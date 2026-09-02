@@ -1,5 +1,7 @@
 ---
 import { Image } from "astro:assets";
+import MorphIcon from "morphicons/astro";
+import { Menu } from "lucide";
 import logo from "@assets/images/logo-nbg.webp";
 
 const links = [
@@ -11,41 +13,307 @@ const links = [
 ];
 ---
 
-<nav
-  class="absolute inset-x-0 top-0 z-10 h-18 border-b border-theme-divider/55 bg-theme-on-accent/30 backdrop-blur-lg"
-  aria-label="Navegación principal"
+<header
+  data-site-navbar
+  class="fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)] lg:pt-0"
 >
-  <div class="flex h-full items-center pl-60 pr-24">
-    <a
-      class="flex h-12 w-30 flex-none items-center overflow-hidden"
-      href="#hero"
-      aria-label="Halisco Joyería, inicio"
-    >
-      <Image
-        src={logo}
-        width={120}
-        height={120}
-        densities={[1, 2]}
-        quality={90}
-        alt=""
-        loading="eager"
-        class="max-w-none h-30 w-30 object-contain"
-      />
-    </a>
+  <nav
+    class="relative z-50 h-16 border-b border-theme-divider/55 bg-theme-on-accent/30 backdrop-blur-lg lg:h-18"
+    aria-label="Navegación principal"
+  >
+    <div class="flex h-full items-center pl-8 pr-5 lg:pl-60 lg:pr-24">
+      <a
+        class="flex h-11 w-24 flex-none items-center overflow-hidden lg:h-12 lg:w-30"
+        href="#hero"
+        aria-label="Halisco Joyería, inicio"
+      >
+        <Image
+          src={logo}
+          width={120}
+          height={120}
+          densities={[1, 2]}
+          quality={90}
+          alt=""
+          loading="eager"
+          class="max-w-none h-24 w-24 object-contain lg:h-30 lg:w-30"
+        />
+      </a>
 
-    <ul class="m-0 ml-auto flex list-none items-center gap-7 p-0">
-      {
-        links.map((link) => (
-          <li>
-            <a
-              class="inline-flex items-center font-body text-sm font-normal leading-5 tracking-widest whitespace-nowrap text-theme-foreground hover:text-theme-accent"
-              href={link.href}
-            >
-              {link.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+      <ul class="m-0 ml-auto hidden list-none items-center gap-7 p-0 lg:flex">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                class="inline-flex min-h-11 items-center font-body text-sm font-normal leading-5 tracking-widest whitespace-nowrap text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+                href={link.href}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <button
+        class="ml-auto inline-flex h-11 w-11 items-center justify-center text-theme-foreground transition-colors duration-300 hover:border-theme-foreground hover:text-theme-accent lg:hidden"
+        type="button"
+        data-mobile-menu-toggle
+        aria-controls="mobile-menu-panel"
+        aria-expanded="false"
+        aria-label="Abrir menú"
+      >
+        <MorphIcon icon={Menu} data-morphicon-slot="toggle" />
+      </button>
+    </div>
+  </nav>
+
+  <div
+    class="pointer-events-none fixed inset-0 z-30 bg-theme-background/75 opacity-0 transition-opacity duration-300 motion-reduce:transition-none"
+    data-mobile-menu-overlay
+    aria-hidden="true"
+    inert
+  >
   </div>
-</nav>
+
+  <aside
+    id="mobile-menu-panel"
+    class="fixed inset-y-0 right-0 z-40 flex h-dvh w-[min(82vw,22rem)] translate-x-full flex-col border-l border-theme-divider/60 bg-theme-surface pt-[calc(4rem+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] text-theme-foreground shadow-2xl transition-transform duration-300 ease-out will-change-transform motion-reduce:transition-none lg:hidden"
+    data-mobile-menu-panel
+    aria-hidden="true"
+    aria-label="Menú móvil"
+    inert
+  >
+    <nav class="flex-1 px-5 py-10" aria-label="Navegación móvil">
+      <ul class="m-0 grid list-none gap-5 p-0">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                class="inline-flex min-h-11 items-center font-body text-sm font-normal tracking-[0.18em] text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+                data-mobile-menu-link
+                href={link.href}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <script>
+      import { Menu, X } from "lucide";
+      import type { MorphIconElement } from "morphicons/element";
+      import { gsap } from "gsap";
+
+      const NAVBAR_SELECTOR = "[data-site-navbar]";
+      const TOGGLE_SELECTOR = "[data-mobile-menu-toggle]";
+      const OVERLAY_SELECTOR = "[data-mobile-menu-overlay]";
+      const PANEL_SELECTOR = "[data-mobile-menu-panel]";
+      const LINK_SELECTOR = "[data-mobile-menu-link]";
+
+      type MenuState = "open" | "closed";
+
+      const setMenuState = (
+        navbar: HTMLElement,
+        panel: HTMLElement,
+        overlay: HTMLElement,
+        toggleButton: HTMLButtonElement,
+        morphIcon: MorphIconElement,
+        state: MenuState,
+      ): void => {
+        const isOpen = state === "open";
+
+        navbar.dataset.mobileMenuState = state;
+        toggleButton.setAttribute("aria-expanded", String(isOpen));
+        toggleButton.setAttribute(
+          "aria-label",
+          isOpen ? "Cerrar menú" : "Abrir menú",
+        );
+        panel.setAttribute("aria-hidden", String(!isOpen));
+        overlay.setAttribute("aria-hidden", String(!isOpen));
+        panel.toggleAttribute("inert", !isOpen);
+        overlay.toggleAttribute("inert", !isOpen);
+
+        panel.classList.toggle("translate-x-full", !isOpen);
+        panel.classList.toggle("translate-x-0", isOpen);
+        overlay.classList.toggle("opacity-0", !isOpen);
+        overlay.classList.toggle("opacity-100", isOpen);
+        overlay.classList.toggle("pointer-events-none", !isOpen);
+        overlay.classList.toggle("pointer-events-auto", isOpen);
+        morphIcon.morphTo(isOpen ? X : Menu);
+      };
+
+      const dispatchMenuEvent = (
+        navbar: HTMLElement,
+        state: MenuState,
+      ): void => {
+        const eventName =
+          state === "open" ? "mobile-menu:opened" : "mobile-menu:closed";
+        // Custom events let future animation hooks react without owning menu state.
+        navbar.dispatchEvent(new CustomEvent(eventName, { bubbles: true }));
+      };
+
+      const initMobileMenu = (): void => {
+        document
+          .querySelectorAll<HTMLElement>(NAVBAR_SELECTOR)
+          .forEach((navbar) => {
+            if (navbar.dataset.mobileMenuInitialized === "true") {
+              return;
+            }
+
+            const toggleButton =
+              navbar.querySelector<HTMLButtonElement>(TOGGLE_SELECTOR);
+            const morphIcon = toggleButton?.querySelector<MorphIconElement>(
+              'morph-icon[data-morphicon-slot="toggle"]',
+            );
+            const overlay = navbar.querySelector<HTMLElement>(OVERLAY_SELECTOR);
+            const panel = navbar.querySelector<HTMLElement>(PANEL_SELECTOR);
+            const links = navbar.querySelectorAll<HTMLAnchorElement>(LINK_SELECTOR);
+
+            if (
+              !toggleButton ||
+              !morphIcon ||
+              typeof morphIcon.morphTo !== "function" ||
+              !overlay ||
+              !panel
+            ) {
+              return;
+            }
+
+            navbar.dataset.mobileMenuInitialized = "true";
+            let previousBodyOverflow = "";
+            let previousDocumentOverflow = "";
+
+            const media = gsap.matchMedia();
+            let linkTimeline: gsap.core.Timeline | null = null;
+
+            media.add(
+              {
+                isMobile: "(max-width: 63.999rem)",
+                reduceMotion: "(prefers-reduced-motion: reduce)",
+              },
+              (context) => {
+                const isMobile = context.conditions?.isMobile === true;
+                const reduceMotion = context.conditions?.reduceMotion === true;
+
+                if (!isMobile) {
+                  return;
+                }
+
+                linkTimeline = gsap.timeline({
+                  paused: true,
+                });
+
+                linkTimeline.fromTo(
+                  links,
+                  {
+                    y: reduceMotion ? 0 : 16,
+                    autoAlpha: reduceMotion ? 1 : 0,
+                  },
+                  {
+                    y: 0,
+                    autoAlpha: 1,
+                    duration: reduceMotion ? 0 : 0.36,
+                    ease: "power2.out",
+                    stagger: reduceMotion ? 0 : 0.06,
+                    overwrite: "auto",
+                  },
+                );
+
+                const handleMenuOpened = (): void => {
+                  linkTimeline?.restart();
+                };
+
+                const handleMenuClosed = (): void => {
+                  linkTimeline?.pause(0);
+                };
+
+                navbar.addEventListener("mobile-menu:opened", handleMenuOpened);
+
+                navbar.addEventListener("mobile-menu:closed", handleMenuClosed);
+
+                return () => {
+                  navbar.removeEventListener("mobile-menu:opened", handleMenuOpened);
+
+                  navbar.removeEventListener("mobile-menu:closed", handleMenuClosed);
+
+                  linkTimeline?.kill();
+                  linkTimeline = null;
+                };
+              },
+            );
+
+            const lockPageScroll = (): void => {
+              previousBodyOverflow = document.body.style.overflow;
+              previousDocumentOverflow = document.documentElement.style.overflow;
+              // Both roots must be locked to prevent background scroll across mobile browsers.
+              document.body.style.overflow = "hidden";
+              document.documentElement.style.overflow = "hidden";
+            };
+
+            const unlockPageScroll = (): void => {
+              // Restore both roots so any pre-existing inline styles survive the drawer.
+              document.body.style.overflow = previousBodyOverflow;
+              document.documentElement.style.overflow = previousDocumentOverflow;
+            };
+
+            const openMenu = (): void => {
+              if (navbar.dataset.mobileMenuState === "open") {
+                return;
+              }
+
+              lockPageScroll();
+              setMenuState(navbar, panel, overlay, toggleButton, morphIcon, "open");
+              dispatchMenuEvent(navbar, "open");
+            };
+
+            const closeMenu = (): void => {
+              if (navbar.dataset.mobileMenuState !== "open") {
+                return;
+              }
+
+              const focusIsInsidePanel = panel.contains(document.activeElement);
+              setMenuState(navbar, panel, overlay, toggleButton, morphIcon, "closed");
+              unlockPageScroll();
+              if (focusIsInsidePanel) {
+                toggleButton.focus({ preventScroll: true });
+              }
+              dispatchMenuEvent(navbar, "closed");
+            };
+
+            const toggleMenu = (): void => {
+              if (navbar.dataset.mobileMenuState === "open") {
+                closeMenu();
+                return;
+              }
+
+              openMenu();
+            };
+
+            setMenuState(navbar, panel, overlay, toggleButton, morphIcon, "closed");
+            toggleButton.addEventListener("click", toggleMenu);
+            links.forEach((link) => {
+              link.addEventListener("click", closeMenu);
+            });
+            navbar.addEventListener("keydown", (event: KeyboardEvent) => {
+              if (event.key === "Escape" && navbar.dataset.mobileMenuState === "open") {
+                closeMenu();
+              }
+            });
+
+            overlay.addEventListener("click", () => closeMenu());
+
+            const desktopMedia = window.matchMedia("(min-width: 64rem)");
+            desktopMedia.addEventListener("change", (event: MediaQueryListEvent) => {
+              if (event.matches) {
+                closeMenu();
+              }
+            });
+          });
+      };
+
+      initMobileMenu();
+    </script>
+  </aside>
+</header>
