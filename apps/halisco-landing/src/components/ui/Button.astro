@@ -12,15 +12,17 @@ interface Props {
   label: string;
   href: string;
   variant?: Variant;
+  class?: string;
 }
 
-const { label, href, variant = "primary" } = Astro.props;
+const { label, href, variant = "primary", class: customClass } = Astro.props;
 ---
 
 <a
   class:list={[
     "inline-flex h-12 items-center justify-center px-5 font-body text-xs font-light tracking-widest whitespace-nowrap text-center transition-colors duration-300",
     buttonVariants[variant],
+    customClass,
   ]}
   href={href}>{label}</a
 >
