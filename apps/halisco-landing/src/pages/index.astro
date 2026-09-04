@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Hero from "@sections/Hero.astro";
-import Jewelry from "@sections/Jewelry.astro";
+import HeroSection from "@sections/HeroSection.astro";
+import JewelrySection from "@sections/JewelrySection.astro";
+import WorkmanshipSection from "@sections/WorkmanshipSection.astro";
 ---
 
 <BaseLayout
@@ -9,7 +10,8 @@ import Jewelry from "@sections/Jewelry.astro";
 	description="Joyería en oro y plata, hechuras propias y reparaciones en Halisco Joyería."
 >
 		<main id="main-content">
-			<Hero />
-			<Jewelry />
+			<HeroSection />
+			<JewelrySection />
+			<WorkmanshipSection />
 		</main>
 </BaseLayout>
