@@ -1,0 +1,348 @@
+---
+import type { ImageMetadata } from "astro";
+import slaveM from "@assets/images/work-gallery/slave-m.webp";
+import slaveMBox from "@assets/images/work-gallery/slave-m-box.webp";
+import slaveLeon from "@assets/images/work-gallery/slave-leon.webp";
+import slaveBrasilena from "@assets/images/work-gallery/slave-brasilena.webp";
+import slaveBicolor from "@assets/images/work-gallery/slave-bicolor.webp";
+import ringR from "@assets/images/work-gallery/ring-r.webp";
+import pendantSb from "@assets/images/work-gallery/pendant-sb.webp";
+import cubanaTrebol from "@assets/images/work-gallery/cubana-trebol.webp";
+import cubanaSide from "@assets/images/work-gallery/cubana-side.webp";
+import cubanaMariana from "@assets/images/work-gallery/cubana-mariana.webp";
+import cubanaHuerta from "@assets/images/work-gallery/cubana-huerta.webp";
+import CarouselSlide from "@ui/CarouselSlide.astro";
+import Button from "@ui/Button.astro";
+import ImageLightbox from "@ui/ImageLightbox.astro";
+import SectionContainer from "@ui/SectionContainer.astro";
+
+interface GalleryImage {
+  image: ImageMetadata;
+  alt: string;
+}
+
+const galleryImages = [
+  {
+    image: slaveM,
+    alt: "Pulsera de eslabones anchos con placa central de letra geométrica.",
+  },
+  {
+    image: slaveMBox,
+    alt: "Pulsera de eslabones anchos sobre el logotipo de Halisco Joyería.",
+  },
+  {
+    image: slaveLeon,
+    alt: "Pulsera dorada con placa central de letra cursiva.",
+  },
+  {
+    image: slaveBrasilena,
+    alt: "Pulsera dorada con cuentas verdes y amarillas.",
+  },
+  {
+    image: slaveBicolor,
+    alt: "Pulsera dorada con placa central de diseño calado.",
+  },
+  {
+    image: ringR,
+    alt: "Anillo dorado con la letra R en relieve.",
+  },
+  {
+    image: pendantSb,
+    alt: "Dije circular dorado con las letras SB.",
+  },
+  {
+    image: cubanaTrebol,
+    alt: "Pulsera dorada con placa central y motivo floral en relieve.",
+  },
+  {
+    image: cubanaSide,
+    alt: "Pulsera de eslabones dorados vista en perspectiva.",
+  },
+  {
+    image: cubanaMariana,
+    alt: "Pulsera dorada con placa central de nombre en letra cursiva.",
+  },
+  {
+    image: cubanaHuerta,
+    alt: "Pulsera dorada con placa central de nombre en letra cursiva.",
+  },
+] satisfies readonly GalleryImage[];
+---
+
+<SectionContainer
+  id="work-gallery"
+  aria-labelledby="work-gallery-title"
+  class="overflow-hidden bg-theme-surface py-20 lg:py-24"
+>
+  <div
+    class="grid grid-cols-1 gap-y-12 lg:grid-cols-12 lg:gap-x-16 lg:gap-y-20"
+  >
+    <header class="col-span-1 lg:col-span-7">
+      <p
+        class="mb-4 font-body text-xs font-light tracking-[4px] text-theme-accent"
+      >
+        NUESTRO TRABAJO
+      </p>
+      <h2
+        id="work-gallery-title"
+        class="m-0 max-w-3xl font-display text-[34px] font-medium leading-[1.08] tracking-tight text-theme-foreground lg:text-5xl"
+      >
+        Conoce nuestro trabajo
+      </h2>
+    </header>
+
+    <div class="col-span-1 lg:col-span-5 lg:pt-8">
+      <p
+        class="m-0 max-w-xl font-body text-base font-normal leading-[1.6] text-theme-muted"
+      >
+        Explora una selección de piezas y trabajos para conocer de cerca nuestro
+        oficio.
+      </p>
+    </div>
+
+    <div data-work-gallery class="col-span-1 min-w-0 lg:col-span-12">
+      <div
+        data-carousel-viewport
+        role="region"
+        aria-roledescription="carrusel"
+        aria-label="Selección de nuestro trabajo"
+        tabindex="0"
+        class="w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-auto motion-safe:scroll-smooth"
+      >
+        <ul class="m-0 flex w-max gap-5 px-0 py-1 lg:gap-8">
+          {
+            galleryImages.map((item, index) => (
+              <CarouselSlide image={item.image} alt={item.alt} index={index} />
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button
+          type="button"
+          data-carousel-previous
+          class="inline-flex h-11 w-11 cursor-pointer items-center justify-center text-theme-foreground transition-colors duration-300 hover:text-theme-accent disabled:cursor-not-allowed disabled:opacity-40"
+          aria-label="Imagen anterior"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-carousel-next
+          class="inline-flex h-11 w-11 cursor-pointer items-center justify-center text-theme-foreground transition-colors duration-300 hover:text-theme-accent disabled:cursor-not-allowed disabled:opacity-40"
+          aria-label="Imagen siguiente"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mt-8 flex justify-end">
+        <Button label="COTIZAR POR WHATSAPP" href="#whatsapp" />
+      </div>
+
+      <ImageLightbox id="work-gallery-lightbox" images={galleryImages} />
+    </div>
+  </div>
+</SectionContainer>
+
+<script>
+  const initWorkGalleries = (): void => {
+    document
+      .querySelectorAll<HTMLElement>("[data-work-gallery]")
+      .forEach((root) => {
+        if (root.dataset.workGalleryInitialized === "true") {
+          return;
+        }
+
+        const viewport = root.querySelector<HTMLElement>(
+          "[data-carousel-viewport]",
+        );
+        const lightbox = root.querySelector<HTMLDialogElement>(
+          "[data-image-lightbox]",
+        );
+        const previousButton = root.querySelector<HTMLButtonElement>(
+          "[data-carousel-previous]",
+        );
+        const nextButton = root.querySelector<HTMLButtonElement>(
+          "[data-carousel-next]",
+        );
+        const slides = Array.from(
+          root.querySelectorAll<HTMLElement>("[data-carousel-slide-item]"),
+        );
+        const slideButtons = Array.from(
+          root.querySelectorAll<HTMLButtonElement>("[data-carousel-slide]"),
+        );
+
+        if (
+          !viewport ||
+          !lightbox ||
+          !previousButton ||
+          !nextButton ||
+          slides.length === 0
+        ) {
+          return;
+        }
+
+        root.dataset.workGalleryInitialized = "true";
+        let activeIndex = 0;
+        let scrollEndTimer: number | undefined;
+
+        const setActiveIndex = (index: number): void => {
+          activeIndex = Math.min(Math.max(index, 0), slides.length - 1);
+          previousButton.disabled = activeIndex === 0;
+          nextButton.disabled = activeIndex === slides.length - 1;
+        };
+
+        const getSlideOffset = (slide: HTMLElement): number =>
+          slide.getBoundingClientRect().left -
+          viewport.getBoundingClientRect().left +
+          viewport.scrollLeft;
+
+        const syncActiveIndex = (): void => {
+          const viewportLeft = viewport.getBoundingClientRect().left;
+          let closestIndex = 0;
+          let closestDistance = Number.POSITIVE_INFINITY;
+
+          slides.forEach((slide, index) => {
+            const slideOffset =
+              slide.getBoundingClientRect().left -
+              viewportLeft +
+              viewport.scrollLeft;
+            const distance = Math.abs(slideOffset - viewport.scrollLeft);
+
+            if (distance < closestDistance) {
+              closestIndex = index;
+              closestDistance = distance;
+            }
+          });
+
+          setActiveIndex(closestIndex);
+        };
+
+        const scrollToIndex = (index: number): void => {
+          const nextIndex = Math.min(Math.max(index, 0), slides.length - 1);
+          const slide = slides[nextIndex];
+
+          if (!slide) {
+            return;
+          }
+
+          setActiveIndex(nextIndex);
+          const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+          ).matches;
+
+          viewport.scrollTo({
+            left: getSlideOffset(slide),
+            behavior: prefersReducedMotion ? "auto" : "smooth",
+          });
+        };
+
+        const handlePrevious = (): void => {
+          if (activeIndex > 0) {
+            scrollToIndex(activeIndex - 1);
+          }
+        };
+
+        const handleNext = (): void => {
+          if (activeIndex < slides.length - 1) {
+            scrollToIndex(activeIndex + 1);
+          }
+        };
+
+        const handleSlideClick = (event: MouseEvent): void => {
+          const button = event.currentTarget;
+
+          if (!(button instanceof HTMLButtonElement)) {
+            return;
+          }
+
+          const index = slideButtons.indexOf(button);
+
+          if (index === -1) {
+            return;
+          }
+
+          lightbox.dispatchEvent(
+            new CustomEvent("image-lightbox:open", {
+              detail: { index },
+            }),
+          );
+        };
+
+        const handleScroll = (): void => {
+          if (scrollEndTimer !== undefined) {
+            window.clearTimeout(scrollEndTimer);
+          }
+
+          scrollEndTimer = window.setTimeout(() => {
+            scrollEndTimer = undefined;
+            syncActiveIndex();
+          }, 120);
+        };
+
+        const handleScrollEnd = (): void => {
+          if (scrollEndTimer !== undefined) {
+            window.clearTimeout(scrollEndTimer);
+            scrollEndTimer = undefined;
+          }
+
+          syncActiveIndex();
+        };
+
+        slideButtons.forEach((button) => {
+          button.addEventListener("click", handleSlideClick);
+        });
+        previousButton.addEventListener("click", handlePrevious);
+        nextButton.addEventListener("click", handleNext);
+        viewport.addEventListener("scroll", handleScroll, { passive: true });
+        viewport.addEventListener("scrollend", handleScrollEnd);
+
+        const cleanup = (): void => {
+          if (scrollEndTimer !== undefined) {
+            window.clearTimeout(scrollEndTimer);
+          }
+
+          slideButtons.forEach((button) => {
+            button.removeEventListener("click", handleSlideClick);
+          });
+          previousButton.removeEventListener("click", handlePrevious);
+          nextButton.removeEventListener("click", handleNext);
+          viewport.removeEventListener("scroll", handleScroll);
+          viewport.removeEventListener("scrollend", handleScrollEnd);
+          document.removeEventListener("astro:before-swap", cleanup);
+          root.dataset.workGalleryInitialized = "false";
+        };
+
+        document.addEventListener("astro:before-swap", cleanup, { once: true });
+        setActiveIndex(0);
+      });
+  };
+
+  initWorkGalleries();
+</script>
