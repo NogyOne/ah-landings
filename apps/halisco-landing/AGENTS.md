@@ -11,8 +11,6 @@ The project is about a landing page for a Jewelry Store with the goal of give in
 | Runtime        | Node.js `>=22.12.0`                                                             |
 | TypeScript     | Astro strict configuration                                                      |
 | Rendering      | Astro default static output; no server adapter or output override               |
-| Implementation | Verified desktop Navbar/Hero/Jewelry slice with reusable `SectionContainer` in `src/layouts/`, `src/components/site/`, `src/components/ui/`, `src/components/sections/`, and `src/pages/index.astro` |
-| Design intent  | Accepted direction in `docs/design-brief.md`, not proof of implemented behavior |
 
 For version-sensitive Astro, Tailwind, or integration APIs, consult
 Context7 before implementing rather than relying on potentially outdated APIs.
@@ -39,10 +37,10 @@ Do not claim or run `astro check`: `@astrojs/check` and TypeScript are not decla
 - `src/components/site/` owns persistent Halisco brand/site chrome.
 - `src/components/ui/` owns reusable visual/layout primitives.
 - `src/components/sections/` owns page-specific sections.
+- Page-section components live in `src/components/sections/`; filenames and matching imported component identifiers use English PascalCase and end in `Section` (`Section.astro` for files).
+- `src/assets/images/` is organized by asset domain under `brand/`, `hero/`, `jewelry/`, `workmanship/`, `work-gallery/`, and `repairs/`; keep optimized local image imports in their owning domain and use `public/` only for passthrough assets.
 - `docs/architecture.md` describes verified implementation structure.
-- `docs/design-brief.md` owns accepted product and visual intent.
 - Root `../../docs/` owns workspace-wide topology and conventions.
-- When design intent and current code differ, describe both explicitly; never present intent as shipped behavior.
 
 ## Hard Rules
 
