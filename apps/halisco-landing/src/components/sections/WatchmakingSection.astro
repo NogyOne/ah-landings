@@ -1,0 +1,210 @@
+---
+import { Image } from "astro:assets";
+import watchRepair from "@assets/images/watches/watch-repair.webp";
+import SectionContainer from "@ui/SectionContainer.astro";
+import Button from "@ui/Button.astro";
+
+const services = [
+  "Cambio de batería",
+  "Correas y extensibles",
+  "Ajuste de extensible",
+  "Cambio de cristal",
+  "Limpieza y servicio",
+  "Revisión de maquinaria",
+] as const;
+---
+
+<SectionContainer
+  id="watchmaking"
+  aria-labelledby="watchmaking-title"
+  class="overflow-hidden bg-theme-surface py-16 lg:py-20"
+>
+  <div
+    slot="background"
+    class="pointer-events-none absolute right-4 top-6 z-0 h-32 w-40 bg-[linear-gradient(to_right,color-mix(in_srgb,var(--color-theme-divider)_7%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_srgb,var(--color-theme-divider)_7%,transparent)_1px,transparent_1px)] bg-size-[2.75rem_2.75rem] mask-[radial-gradient(ellipse_70%_70%_at_50%_50%,black_35%,transparent_100%)] [-webkit-mask-image:radial-gradient(ellipse_70%_70%_at_50%_50%,black_35%,transparent_100%)] lg:right-10 lg:top-10 lg:h-44 lg:w-72 2xl:right-[calc((100vw-80rem)/2+2rem)]"
+    aria-hidden="true"
+    data-watchmaking-grid
+  >
+  </div>
+
+  <div
+    class="relative z-10 grid grid-cols-1 gap-y-10 [grid-template-areas:'intro'_'image'_'services'] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-rows-[auto_auto] lg:items-stretch lg:gap-x-16 lg:gap-y-8 lg:[grid-template-areas:'image_intro'_'image_services']"
+    data-watchmaking-content
+  >
+    <header class="[grid-area:intro]" data-watchmaking-intro>
+      <p
+        class="mb-4 font-body text-xs font-light tracking-[4px] text-theme-accent"
+      >
+        RELOJERÍA
+      </p>
+      <h2
+        id="watchmaking-title"
+        class="m-0 max-w-3xl font-display text-[34px] font-medium leading-[1.08] tracking-tight text-theme-foreground lg:text-5xl"
+      >
+        Precisión para seguir marcando tus días.
+      </h2>
+      <p
+        class="m-0 mt-6 max-w-xl font-body text-base font-normal leading-[1.6] text-theme-muted"
+      >
+        Resolvemos servicios cotidianos y evaluamos el reloj antes de
+        confirmar trabajos de mayor alcance.
+      </p>
+    </header>
+
+    <figure
+      class="relative m-0 aspect-3/2 w-full overflow-hidden [grid-area:image] lg:aspect-auto lg:h-full"
+      data-watchmaking-image
+    >
+      <Image
+        src={watchRepair}
+        alt="Manos reparando la maquinaria interna de un reloj."
+        width={1200}
+        height={800}
+        densities={[1, 2]}
+        quality={84}
+        fit="cover"
+        position="center"
+        loading="lazy"
+        class="h-full w-full object-cover object-center"
+      />
+    </figure>
+
+    <div class="[grid-area:services]" data-watchmaking-details>
+      <ul
+        class="m-0 grid list-disc grid-cols-1 gap-y-2 pl-5 font-body text-base font-normal leading-[1.6] text-theme-foreground marker:text-theme-accent lg:grid-cols-2 lg:gap-x-8"
+        data-watchmaking-list
+      >
+        {services.map((service) => <li>{service}</li>)}
+      </ul>
+      <p
+        class="m-0 mt-6 font-body text-base font-normal leading-[1.6] text-theme-muted"
+      >
+        También contamos con relojes disponibles en aparador; puedes
+        visitarnos o escribirnos para conocer las opciones.
+      </p>
+      <div class="mt-6 lg:mt-8">
+        <Button label="CONSULTAR RELOJERÍA" href="#whatsapp" />
+      </div>
+    </div>
+  </div>
+</SectionContainer>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const ROOT_SELECTOR = "#watchmaking";
+
+  const initWatchmakingReveal = (): void => {
+    document.querySelectorAll<HTMLElement>(ROOT_SELECTOR).forEach((root) => {
+      if (root.dataset.watchmakingInitialized === "true") {
+        return;
+      }
+
+      const image = root.querySelector<HTMLElement>(
+        "[data-watchmaking-image]",
+      );
+      const grid = root.querySelector<HTMLElement>("[data-watchmaking-grid]");
+      const intro = root.querySelector<HTMLElement>(
+        "[data-watchmaking-intro]",
+      );
+      const details = root.querySelector<HTMLElement>(
+        "[data-watchmaking-details]",
+      );
+      const items = root.querySelectorAll<HTMLElement>(
+        "[data-watchmaking-list] li",
+      );
+
+      if (!image || !intro || !details) {
+        return;
+      }
+
+      root.dataset.watchmakingInitialized = "true";
+
+      const mm = gsap.matchMedia();
+      let timeline: gsap.core.Timeline | null = null;
+
+      mm.add(
+        {
+          reduceMotion: "(prefers-reduced-motion: reduce)",
+          fullMotion: "(prefers-reduced-motion: no-preference)",
+        },
+        (context) => {
+          const reduceMotion = context.conditions?.reduceMotion === true;
+
+          timeline = gsap.timeline({
+            defaults: { ease: "power2.out" },
+            scrollTrigger: {
+              trigger: root,
+              start: "top 80%",
+              once: true,
+            },
+          });
+
+          if (reduceMotion) {
+            timeline.fromTo(
+              [image, grid, intro, details].filter(
+                (target): target is HTMLElement => target !== null,
+              ),
+              { autoAlpha: 0 },
+              { autoAlpha: 1, duration: 0.24 },
+            );
+          } else {
+            timeline
+              .fromTo(
+                image,
+                { autoAlpha: 0, x: -16, scale: 1.03 },
+                { autoAlpha: 1, x: 0, scale: 1, duration: 0.7 },
+                0,
+              )
+              .fromTo(
+                grid,
+                { autoAlpha: 0 },
+                { autoAlpha: 1, duration: 0.6 },
+                0.1,
+              )
+              .fromTo(
+                intro,
+                { autoAlpha: 0, y: 14 },
+                { autoAlpha: 1, y: 0, duration: 0.55 },
+                0.15,
+              )
+              .fromTo(
+                details,
+                { autoAlpha: 0, y: 14 },
+                { autoAlpha: 1, y: 0, duration: 0.55 },
+                0.28,
+              );
+
+            if (items.length > 0) {
+              timeline.fromTo(
+                items,
+                { autoAlpha: 0, y: 6 },
+                { autoAlpha: 1, y: 0, duration: 0.35, stagger: 0.04 },
+                0.4,
+              );
+            }
+          }
+
+          return () => {
+            timeline?.scrollTrigger?.kill();
+            timeline?.revert();
+            timeline = null;
+          };
+        },
+      );
+
+      const cleanup = (): void => {
+        mm.revert();
+        document.removeEventListener("astro:before-swap", cleanup);
+        root.dataset.watchmakingInitialized = "false";
+      };
+
+      document.addEventListener("astro:before-swap", cleanup, { once: true });
+    });
+  };
+
+  initWatchmakingReveal();
+</script>
