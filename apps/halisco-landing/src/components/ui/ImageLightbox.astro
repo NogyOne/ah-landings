@@ -19,11 +19,11 @@ const { images, id = "image-lightbox" } = Astro.props;
   id={id}
   data-image-lightbox
   aria-label="Vista ampliada de la galería"
-  class="m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 bg-theme-background/95 p-4 text-theme-foreground backdrop:bg-theme-background/90 md:p-8"
+  class="m-0 h-dvh max-h-none w-full max-w-none select-none overflow-hidden border-0 bg-transparent p-4 text-theme-foreground backdrop:bg-transparent md:p-8"
 >
   <div
     data-lightbox-backdrop
-    class="absolute inset-0"
+    class="absolute inset-0 bg-theme-background/95 opacity-0"
     aria-hidden="true"
   ></div>
 
@@ -35,7 +35,7 @@ const { images, id = "image-lightbox" } = Astro.props;
       <button
         type="button"
         data-lightbox-close
-        class="inline-flex h-11 w-11 items-center justify-center text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+        class="inline-flex h-11 w-11 cursor-pointer items-center justify-center text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
         aria-label="Cerrar imagen"
       >
         <svg
@@ -59,7 +59,7 @@ const { images, id = "image-lightbox" } = Astro.props;
       <button
         type="button"
         data-lightbox-previous
-        class="absolute left-0 z-10 inline-flex h-11 w-11 items-center justify-center text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+        class="absolute left-0 z-10 inline-flex h-11 w-11 cursor-pointer items-center justify-center text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
         aria-label="Imagen anterior"
       >
         <svg
@@ -85,8 +85,9 @@ const { images, id = "image-lightbox" } = Astro.props;
           images.map((item, index) => (
             <div
               data-lightbox-image
+              data-lightbox-target-id={index}
               data-index={index}
-              class="flex h-full w-full items-center justify-center"
+              class="aspect-4/5 w-full max-w-[calc(80dvh-8rem)] overflow-hidden"
               hidden={index !== 0}
             >
               <Image
@@ -97,7 +98,8 @@ const { images, id = "image-lightbox" } = Astro.props;
                 quality={90}
                 fit="inside"
                 loading="lazy"
-                class="max-h-full max-w-full object-contain"
+                draggable="false"
+                class="h-full w-full object-cover object-center"
               />
             </div>
           ))
@@ -107,7 +109,7 @@ const { images, id = "image-lightbox" } = Astro.props;
       <button
         type="button"
         data-lightbox-next
-        class="absolute right-0 z-10 inline-flex h-11 w-11 items-center justify-center text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+        class="absolute right-0 z-10 inline-flex h-11 w-11 cursor-pointer items-center justify-center text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
         aria-label="Imagen siguiente"
       >
         <svg
@@ -137,6 +139,11 @@ const { images, id = "image-lightbox" } = Astro.props;
 </dialog>
 
 <script>
+  import { gsap } from "gsap";
+  import { Flip } from "gsap/Flip";
+
+  gsap.registerPlugin(Flip);
+
   interface LightboxOpenDetail {
     index: number;
   }
@@ -197,6 +204,54 @@ const { images, id = "image-lightbox" } = Astro.props;
         dialog.dataset.imageLightboxInitialized = "true";
         let activeIndex = 0;
         let restoreTarget: HTMLElement | null = null;
+        let activeTransition: gsap.core.Timeline | null = null;
+        let activeSource: HTMLElement | null = null;
+
+        const galleryRoot = dialog.closest<HTMLElement>("[data-work-gallery]");
+        const carouselViewport = galleryRoot?.querySelector<HTMLElement>(
+          "[data-carousel-viewport]",
+        ) ?? null;
+
+        const prefersReducedMotion = (): boolean =>
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const getSourceFrame = (index: number): HTMLElement | null => {
+          const sourceImage = carouselViewport?.querySelector<HTMLImageElement>(
+            `[data-flip-id="${index}"]`,
+          );
+
+          return sourceImage?.parentElement ?? null;
+        };
+
+        const getTargetFrame = (index: number): HTMLElement | null =>
+          slides[index]?.matches(`[data-lightbox-target-id="${index}"]`)
+            ? slides[index]
+            : null;
+
+        const restoreActiveSource = (): void => {
+          if (activeSource) {
+            gsap.set(activeSource, { clearProps: "visibility" });
+            activeSource = null;
+          }
+        };
+
+        const clearFlipStyles = (target: HTMLElement): void => {
+          gsap.set(target, {
+            clearProps:
+              "transform,transformOrigin,position,top,left,width,height,maxWidth,maxHeight,opacity,visibility,zIndex",
+          });
+        };
+
+        const settleActiveTransition = (): void => {
+          if (!activeTransition) {
+            return;
+          }
+
+          const transition = activeTransition;
+          activeTransition = null;
+          transition.progress(1);
+          transition.kill();
+        };
 
         const normalizeIndex = (index: number): number =>
           (index + slides.length) % slides.length;
@@ -220,7 +275,10 @@ const { images, id = "image-lightbox" } = Astro.props;
           }
         };
 
-        const close = (): void => {
+        const finalizeClose = (): void => {
+          restoreActiveSource();
+          gsap.set(backdrop, { autoAlpha: 0 });
+
           if (dialog.open) {
             dialog.close();
             return;
@@ -229,11 +287,82 @@ const { images, id = "image-lightbox" } = Astro.props;
           restoreFocus();
         };
 
+        const close = (): void => {
+          if (!dialog.open) {
+            restoreFocus();
+            return;
+          }
+
+          settleActiveTransition();
+
+          if (!dialog.open) {
+            restoreFocus();
+            return;
+          }
+
+          const reduceMotion = prefersReducedMotion();
+          const sourceFrame = reduceMotion ? null : getSourceFrame(activeIndex);
+          const targetFrame = getTargetFrame(activeIndex);
+
+          if (reduceMotion || !sourceFrame || !targetFrame) {
+            finalizeClose();
+            return;
+          }
+
+          try {
+            clearFlipStyles(targetFrame);
+            const expandedState = Flip.getState(targetFrame);
+            Flip.fit(targetFrame, sourceFrame, {
+              absolute: true,
+              scale: true,
+            });
+
+            activeSource = sourceFrame;
+            gsap.set(sourceFrame, { visibility: "hidden" });
+
+            const transition = gsap.timeline({
+              onComplete: () => {
+                clearFlipStyles(targetFrame);
+                restoreActiveSource();
+                activeTransition = null;
+                finalizeClose();
+              },
+            });
+
+            activeTransition = transition;
+            transition.add(
+              Flip.from(expandedState, {
+                targets: targetFrame,
+                duration: 0.45,
+                ease: "power3.inOut",
+                absolute: true,
+                scale: true,
+              }),
+              0,
+            );
+            transition.to(
+              backdrop,
+              { autoAlpha: 0, duration: 0.3, ease: "power1.in" },
+              0.05,
+            );
+          } catch {
+            activeTransition = null;
+            clearFlipStyles(targetFrame);
+            restoreActiveSource();
+            finalizeClose();
+          }
+        };
+
         const open = (index: number): void => {
           restoreTarget =
             document.activeElement instanceof HTMLElement
               ? document.activeElement
               : null;
+          settleActiveTransition();
+
+          const reduceMotion = prefersReducedMotion();
+          const sourceFrame = reduceMotion ? null : getSourceFrame(index);
+
           setActiveIndex(index);
 
           if (!dialog.open) {
@@ -241,6 +370,66 @@ const { images, id = "image-lightbox" } = Astro.props;
           }
 
           closeButton.focus({ preventScroll: true });
+
+          const targetFrame = getTargetFrame(index);
+
+          if (!targetFrame) {
+            gsap.set(backdrop, { autoAlpha: 1 });
+            return;
+          }
+
+          if (reduceMotion) {
+            gsap.set(backdrop, { autoAlpha: 1 });
+            return;
+          }
+
+          if (!sourceFrame) {
+            gsap.set(backdrop, { autoAlpha: 1 });
+            return;
+          }
+
+          try {
+            clearFlipStyles(targetFrame);
+            Flip.fit(targetFrame, sourceFrame, {
+              absolute: true,
+              scale: true,
+            });
+            const collapsedState = Flip.getState(targetFrame);
+            clearFlipStyles(targetFrame);
+
+            activeSource = sourceFrame;
+            gsap.set(sourceFrame, { visibility: "hidden" });
+
+            const transition = gsap.timeline({
+              onComplete: () => {
+                clearFlipStyles(targetFrame);
+                restoreActiveSource();
+                activeTransition = null;
+              },
+            });
+
+            activeTransition = transition;
+            transition.add(
+              Flip.from(collapsedState, {
+                targets: targetFrame,
+                duration: 0.55,
+                ease: "power2.inOut",
+                absolute: true,
+                scale: true,
+              }),
+              0,
+            );
+            transition.to(
+              backdrop,
+              { autoAlpha: 1, duration: 0.35, ease: "power1.out" },
+              0.08,
+            );
+          } catch {
+            activeTransition = null;
+            clearFlipStyles(targetFrame);
+            restoreActiveSource();
+            gsap.set(backdrop, { autoAlpha: 1 });
+          }
         };
 
         const handleOpen = (event: Event): void => {
@@ -252,10 +441,12 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const handlePrevious = (): void => {
+          settleActiveTransition();
           setActiveIndex(activeIndex - 1);
         };
 
         const handleNext = (): void => {
+          settleActiveTransition();
           setActiveIndex(activeIndex + 1);
         };
 
@@ -309,6 +500,23 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const cleanup = (): void => {
+          if (activeTransition) {
+            activeTransition.kill();
+            activeTransition = null;
+          }
+
+          restoreActiveSource();
+          slides.forEach((slide) => {
+            const image = slide.querySelector<HTMLElement>(
+              "[data-lightbox-target-id]",
+            );
+
+            if (image) {
+              clearFlipStyles(image);
+            }
+          });
+          gsap.set(backdrop, { clearProps: "opacity,visibility" });
+
           if (dialog.open) {
             dialog.close();
           }

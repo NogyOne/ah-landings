@@ -107,9 +107,9 @@ const galleryImages = [
         aria-roledescription="carrusel"
         aria-label="Selección de nuestro trabajo"
         tabindex="0"
-        class="w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-auto motion-safe:scroll-smooth"
+        class="w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-safe:scroll-smooth"
       >
-        <ul class="m-0 flex w-max gap-5 px-0 py-1 lg:gap-8">
+        <ul class="m-0 flex gap-5 px-0 py-1 lg:gap-8">
           {
             galleryImages.map((item, index) => (
               <CarouselSlide image={item.image} alt={item.alt} index={index} />
@@ -210,18 +210,39 @@ const galleryImages = [
 
         root.dataset.workGalleryInitialized = "true";
         let activeIndex = 0;
+        let maxIndex = 0;
         let scrollEndTimer: number | undefined;
-
-        const setActiveIndex = (index: number): void => {
-          activeIndex = Math.min(Math.max(index, 0), slides.length - 1);
-          previousButton.disabled = activeIndex === 0;
-          nextButton.disabled = activeIndex === slides.length - 1;
-        };
+        let resizeTimer: number | undefined;
 
         const getSlideOffset = (slide: HTMLElement): number =>
           slide.getBoundingClientRect().left -
           viewport.getBoundingClientRect().left +
           viewport.scrollLeft;
+
+        const computeMaxIndex = (): number => {
+          const maxScrollLeft = Math.max(
+            0,
+            viewport.scrollWidth - viewport.clientWidth,
+          );
+          let lastReachableIndex = slides.length - 1;
+
+          for (let index = slides.length - 1; index >= 0; index -= 1) {
+            const slide = slides[index];
+
+            if (slide && getSlideOffset(slide) <= maxScrollLeft + 1) {
+              lastReachableIndex = index;
+              break;
+            }
+          }
+
+          return lastReachableIndex;
+        };
+
+        const setActiveIndex = (index: number): void => {
+          activeIndex = Math.min(Math.max(index, 0), maxIndex);
+          previousButton.disabled = activeIndex <= 0;
+          nextButton.disabled = activeIndex >= maxIndex;
+        };
 
         const syncActiveIndex = (): void => {
           const viewportLeft = viewport.getBoundingClientRect().left;
@@ -244,8 +265,11 @@ const galleryImages = [
           setActiveIndex(closestIndex);
         };
 
-        const scrollToIndex = (index: number): void => {
-          const nextIndex = Math.min(Math.max(index, 0), slides.length - 1);
+        const scrollToIndex = (
+          index: number,
+          behavior: ScrollBehavior = "smooth",
+        ): void => {
+          const nextIndex = Math.min(Math.max(index, 0), maxIndex);
           const slide = slides[nextIndex];
 
           if (!slide) {
@@ -259,7 +283,7 @@ const galleryImages = [
 
           viewport.scrollTo({
             left: getSlideOffset(slide),
-            behavior: prefersReducedMotion ? "auto" : "smooth",
+            behavior: prefersReducedMotion ? "auto" : behavior,
           });
         };
 
@@ -270,7 +294,7 @@ const galleryImages = [
         };
 
         const handleNext = (): void => {
-          if (activeIndex < slides.length - 1) {
+          if (activeIndex < maxIndex) {
             scrollToIndex(activeIndex + 1);
           }
         };
@@ -315,6 +339,19 @@ const galleryImages = [
           syncActiveIndex();
         };
 
+        const handleResize = (): void => {
+          if (resizeTimer !== undefined) {
+            window.clearTimeout(resizeTimer);
+          }
+
+          resizeTimer = window.setTimeout(() => {
+            resizeTimer = undefined;
+            maxIndex = computeMaxIndex();
+            syncActiveIndex();
+            scrollToIndex(activeIndex, "auto");
+          }, 150);
+        };
+
         slideButtons.forEach((button) => {
           button.addEventListener("click", handleSlideClick);
         });
@@ -322,10 +359,15 @@ const galleryImages = [
         nextButton.addEventListener("click", handleNext);
         viewport.addEventListener("scroll", handleScroll, { passive: true });
         viewport.addEventListener("scrollend", handleScrollEnd);
+        window.addEventListener("resize", handleResize);
 
         const cleanup = (): void => {
           if (scrollEndTimer !== undefined) {
             window.clearTimeout(scrollEndTimer);
+          }
+
+          if (resizeTimer !== undefined) {
+            window.clearTimeout(resizeTimer);
           }
 
           slideButtons.forEach((button) => {
@@ -335,11 +377,13 @@ const galleryImages = [
           nextButton.removeEventListener("click", handleNext);
           viewport.removeEventListener("scroll", handleScroll);
           viewport.removeEventListener("scrollend", handleScrollEnd);
+          window.removeEventListener("resize", handleResize);
           document.removeEventListener("astro:before-swap", cleanup);
           root.dataset.workGalleryInitialized = "false";
         };
 
         document.addEventListener("astro:before-swap", cleanup, { once: true });
+        maxIndex = computeMaxIndex();
         setActiveIndex(0);
       });
   };

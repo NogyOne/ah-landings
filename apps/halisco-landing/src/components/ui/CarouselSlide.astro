@@ -14,7 +14,7 @@ const { image, alt, index } = Astro.props;
 <li
   data-carousel-slide-item
   data-index={index}
-  class="w-[min(82vw,20rem)] shrink-0 snap-start lg:w-85"
+  class="w-full shrink-0 snap-start md:w-[calc(50%_-_10px)] lg:w-[calc(25%_-_24px)]"
 >
   <article class="w-full transition-transform duration-300 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
     <button
@@ -36,6 +36,7 @@ const { image, alt, index } = Astro.props;
           fit="cover"
           position="center"
           loading="lazy"
+          data-flip-id={index}
           class="h-full w-full object-cover object-center"
         />
       </span>
