@@ -3,7 +3,7 @@ name: gsap-plugins
 description: "Trigger: GSAP plugins, Flip, FLIP animation, registerPlugin, shared-element transition. Register GSAP plugins and apply Flip layout transitions safely."
 license: MIT
 metadata:
-  author: "greensock"
+  author: "nerdy-cloud"
   version: "1.0"
   scope: [halisco-landing]
   auto_invoke:
