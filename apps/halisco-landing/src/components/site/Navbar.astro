@@ -44,10 +44,12 @@ const links = [
           links.map((link) => (
             <li>
               <a
-                class="inline-flex min-h-11 items-center font-body text-sm font-normal leading-5 tracking-widest whitespace-nowrap text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+                class="nav-link inline-flex min-h-11 items-center font-body text-sm font-normal leading-5 tracking-widest whitespace-nowrap text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+                data-nav-link
+                data-nav-target={link.href.slice(1)}
                 href={link.href}
               >
-                {link.label}
+                <span class="nav-link-label">{link.label}</span>
               </a>
             </li>
           ))
@@ -89,11 +91,13 @@ const links = [
           links.map((link) => (
             <li>
               <a
-                class="inline-flex min-h-11 items-center font-body text-sm font-normal tracking-[0.18em] text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+                class="nav-link inline-flex min-h-11 items-center font-body text-sm font-normal tracking-[0.18em] text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+                data-nav-link
                 data-mobile-menu-link
+                data-nav-target={link.href.slice(1)}
                 href={link.href}
               >
-                {link.label}
+                <span class="nav-link-label">{link.label}</span>
               </a>
             </li>
           ))
@@ -313,7 +317,191 @@ const links = [
           });
       };
 
+      const ACTIVE_LINK_ATTRIBUTE = "aria-current";
+      const ACTIVE_LINK_VALUE = "location";
+
+      type TrackedSection = {
+        target: string;
+        element: HTMLElement;
+      };
+
+      const initActiveSectionTracking = (): void => {
+        document
+          .querySelectorAll<HTMLElement>(NAVBAR_SELECTOR)
+          .forEach((navbar) => {
+            if (navbar.dataset.sectionTrackingInitialized === "true") {
+              return;
+            }
+
+            const navElement = navbar.querySelector<HTMLElement>("nav");
+            const navLinks =
+              navbar.querySelectorAll<HTMLAnchorElement>("[data-nav-link]");
+
+            if (!navElement || navLinks.length === 0) {
+              return;
+            }
+
+            navbar.dataset.sectionTrackingInitialized = "true";
+
+            const trackedSections: TrackedSection[] = [];
+            const seenTargets = new Set<string>();
+
+            navLinks.forEach((link) => {
+              const target = link.dataset.navTarget;
+
+              if (!target || seenTargets.has(target)) {
+                return;
+              }
+
+              const sectionElement = document.getElementById(target);
+
+              // Future sections (e.g. #watchmaking, #questions) only exist as
+              // hidden anchor targets today; ignore anything that is not a
+              // real <section> so they never falsely report as active.
+              if (!sectionElement || sectionElement.tagName !== "SECTION") {
+                return;
+              }
+
+              seenTargets.add(target);
+              trackedSections.push({ target, element: sectionElement });
+            });
+
+            if (trackedSections.length === 0) {
+              return;
+            }
+
+            let ticking = false;
+            let activeTarget: string | null = null;
+
+            const applyActiveTarget = (nextActiveTarget: string | null): void => {
+              if (nextActiveTarget === activeTarget) {
+                return;
+              }
+
+              activeTarget = nextActiveTarget;
+
+              navLinks.forEach((link) => {
+                const isActive = link.dataset.navTarget === activeTarget;
+
+                link.classList.toggle("is-active", isActive);
+
+                if (isActive) {
+                  link.setAttribute(ACTIVE_LINK_ATTRIBUTE, ACTIVE_LINK_VALUE);
+                } else {
+                  link.removeAttribute(ACTIVE_LINK_ATTRIBUTE);
+                }
+              });
+            };
+
+            const computeActiveTarget = (): string | null => {
+              // The fixed navbar's own bottom edge is the activation line: a
+              // section becomes active once it reaches that visible boundary.
+              const activationY = navElement.getBoundingClientRect().bottom;
+
+              for (const section of trackedSections) {
+                const rect = section.element.getBoundingClientRect();
+
+                if (rect.top <= activationY && rect.bottom > activationY) {
+                  return section.target;
+                }
+              }
+
+              return null;
+            };
+
+            const updateActiveSection = (): void => {
+              ticking = false;
+              applyActiveTarget(computeActiveTarget());
+            };
+
+            const requestUpdate = (): void => {
+              if (ticking) {
+                return;
+              }
+
+              ticking = true;
+              window.requestAnimationFrame(updateActiveSection);
+            };
+
+            window.addEventListener("scroll", requestUpdate, { passive: true });
+            window.addEventListener("resize", requestUpdate);
+
+            const cleanup = (): void => {
+              window.removeEventListener("scroll", requestUpdate);
+              window.removeEventListener("resize", requestUpdate);
+              document.removeEventListener("astro:before-swap", cleanup);
+              navbar.dataset.sectionTrackingInitialized = "false";
+            };
+
+            document.addEventListener("astro:before-swap", cleanup, {
+              once: true,
+            });
+
+            updateActiveSection();
+          });
+      };
+
       initMobileMenu();
+      initActiveSectionTracking();
     </script>
   </aside>
+
+  <style>
+    .nav-link {
+      position: relative;
+    }
+
+    .nav-link.is-active {
+      color: var(--color-theme-accent);
+    }
+
+    .nav-link-label {
+      position: relative;
+      display: inline-block;
+    }
+
+    .nav-link-label::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -6px;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--color-theme-accent) 30%,
+        var(--color-theme-accent) 70%,
+        transparent 100%
+      );
+      opacity: 0;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition:
+        transform 160ms ease-in,
+        opacity 160ms ease-in;
+      pointer-events: none;
+    }
+
+    .nav-link:hover .nav-link-label::after,
+    .nav-link:focus-visible .nav-link-label::after {
+      opacity: 1;
+      transform: scaleX(1);
+      transition:
+        transform 240ms cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 200ms ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nav-link-label::after {
+        transform: none;
+        transition: opacity 150ms ease;
+      }
+
+      .nav-link:hover .nav-link-label::after,
+      .nav-link:focus-visible .nav-link-label::after {
+        transition: opacity 150ms ease;
+      }
+    }
+  </style>
 </header>
