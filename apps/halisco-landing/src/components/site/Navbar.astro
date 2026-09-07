@@ -355,9 +355,8 @@ const links = [
 
               const sectionElement = document.getElementById(target);
 
-              // Future sections (e.g. #watchmaking, #questions) only exist as
-              // hidden anchor targets today; ignore anything that is not a
-              // real <section> so they never falsely report as active.
+              // Ignore temporary anchor targets that are not real sections so
+              // they never falsely report as active.
               if (!sectionElement || sectionElement.tagName !== "SECTION") {
                 return;
               }
@@ -397,6 +396,16 @@ const links = [
               // The fixed navbar's own bottom edge is the activation line: a
               // section becomes active once it reaches that visible boundary.
               const activationY = navElement.getBoundingClientRect().bottom;
+
+              // The final section may not have enough content below it to reach
+              // the activation line. At the document end, it owns the active state.
+              const reachedDocumentEnd =
+                window.scrollY + window.innerHeight >=
+                document.documentElement.scrollHeight - 2;
+
+              if (reachedDocumentEnd) {
+                return trackedSections.at(-1)?.target ?? null;
+              }
 
               for (const section of trackedSections) {
                 const rect = section.element.getBoundingClientRect();

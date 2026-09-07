@@ -1,0 +1,294 @@
+---
+import MorphIcon from "morphicons/astro";
+import { CirclePlus, CircleX } from "lucide";
+import SectionContainer from "@ui/SectionContainer.astro";
+
+const faqs = [
+  {
+    question: "¿Qué diferencia hay entre oro 10k y 14k?",
+    answer:
+      "El kilataje indica la proporción de oro dentro de la aleación. Esa diferencia influye en color, dureza, uso y presupuesto; te orientamos según la pieza que buscas o el trabajo que necesitas.",
+  },
+  {
+    question: "¿Puedo llevar mi propio oro o plata?",
+    answer:
+      "Podemos revisar el material y valorar si es adecuado para el trabajo que buscas. La viabilidad depende de su estado, pureza, cantidad y del diseño, por eso la confirmación se realiza después de evaluarlo físicamente.",
+  },
+  {
+    question: "¿Cómo se considera la merma?",
+    answer:
+      "Cada proceso puede generar una merma distinta. Antes de comenzar revisamos el material y el tipo de trabajo para explicarte qué puede recuperarse y qué variación debe contemplarse.",
+  },
+  {
+    question: "¿Pueden trabajar desde una referencia?",
+    answer:
+      "Sí, una referencia puede ayudarnos a entender la idea. Primero evaluamos medidas, material, complejidad, herramientas y acabados para confirmar qué podemos realizar y qué ajustes serían necesarios.",
+  },
+  {
+    question: "¿Necesitan revisar físicamente una reparación?",
+    answer:
+      "Sí. Una fotografía sirve como primer acercamiento, pero el diagnóstico, el alcance y la cotización final requieren revisar la pieza directamente en el taller.",
+  },
+  {
+    question: "¿Qué envío para cotizar por WhatsApp?",
+    answer:
+      "Envía fotografías claras desde varios ángulos y cuéntanos qué pieza es, qué material conoces y qué necesitas. Con eso podemos orientarte antes de confirmar los detalles al verla físicamente.",
+  },
+] as const;
+
+const columns = [faqs.slice(0, 3), faqs.slice(3)];
+---
+
+<SectionContainer
+  id="questions"
+  aria-labelledby="faq-title"
+  class="bg-theme-background py-20 lg:py-24"
+  innerClass="max-w-none lg:px-16"
+>
+  <header class="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-20">
+    <div>
+      <p
+        class="mb-4 font-body text-xs font-light tracking-[4px] text-theme-accent"
+      >
+        PREGUNTAS FRECUENTES
+      </p>
+      <h2
+        id="faq-title"
+        class="m-0 max-w-3xl font-display text-[34px] font-medium leading-[1.08] tracking-tight text-theme-foreground lg:text-5xl"
+      >
+        Resuelve tus dudas antes de venir.
+      </h2>
+    </div>
+
+    <p
+      class="m-0 max-w-[470px] font-body text-sm leading-[1.65] text-theme-muted lg:justify-self-end lg:pt-4 lg:text-base"
+    >
+      Las fotos ayudan a orientarnos; material, estado y alcance se confirman al
+      revisar cada pieza.
+    </p>
+  </header>
+
+  <div
+    class="mt-14 grid gap-x-20 gap-y-0 lg:mt-16 lg:grid-cols-2"
+    data-faq-root
+  >
+    {
+      columns.map((column) => (
+        <div>
+          {column.map((faq) => {
+            const index = faqs.indexOf(faq);
+            const isOpen = false;
+            const buttonId = `faq-button-${index}`;
+            const panelId = `faq-panel-${index}`;
+
+            return (
+              <article
+                class="relative border-b border-theme-divider/70"
+                data-faq-item
+                data-open={String(isOpen)}
+              >
+                <span
+                  class="pointer-events-none absolute inset-x-0 top-0 h-px origin-center scale-x-0 bg-theme-accent"
+                  data-faq-accent-line
+                  aria-hidden="true"
+                />
+
+                <h3 class="m-0">
+                  <button
+                    id={buttonId}
+                    type="button"
+                    class="grid min-h-20 w-full cursor-pointer grid-cols-[minmax(0,1fr)_2.75rem] items-center gap-4 py-5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent lg:min-h-22"
+                    aria-expanded={String(isOpen)}
+                    aria-controls={panelId}
+                    data-faq-button
+                  >
+                    <span
+                      class:list={[
+                        "min-w-0 font-body text-[17px] font-bold leading-[1.4] transition-colors duration-300 lg:text-[19px]",
+                        isOpen
+                          ? "text-theme-accent"
+                          : "text-theme-foreground",
+                      ]}
+                      data-faq-title
+                    >
+                      {faq.question}
+                    </span>
+
+                    <span
+                      class:list={[
+                        "flex h-11 w-11 shrink-0 items-center justify-center justify-self-end transition-colors duration-300",
+                        isOpen
+                          ? "text-theme-accent"
+                          : "text-theme-foreground",
+                      ]}
+                      data-faq-icon-wrap
+                      aria-hidden="true"
+                    >
+                      <MorphIcon
+                        icon={isOpen ? CircleX : CirclePlus}
+                        data-faq-icon
+                      />
+                    </span>
+                  </button>
+                </h3>
+
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  class="overflow-hidden"
+                  data-faq-panel
+                  hidden={!isOpen}
+                >
+                  <p
+                    class="m-0 max-w-[58ch] pb-7 pr-[3.75rem] font-body text-[15px] leading-[1.65] text-theme-muted lg:text-base"
+                  >
+                    {faq.answer}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ))
+    }
+  </div>
+</SectionContainer>
+
+<script>
+  import { CirclePlus, CircleX } from "lucide";
+  import type { MorphIconElement } from "morphicons/element";
+  import { gsap } from "gsap";
+
+  const initFaqAccordions = (): void => {
+    document.querySelectorAll<HTMLElement>("[data-faq-root]").forEach((root) => {
+      if (root.dataset.faqInitialized === "true") {
+        return;
+      }
+
+      const items = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-faq-item]"),
+      );
+
+      if (items.length === 0) {
+        return;
+      }
+
+      root.dataset.faqInitialized = "true";
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      const duration = reduceMotion ? 0 : 0.38;
+      const cleanups: Array<() => void> = [];
+
+      const setItemState = (item: HTMLElement, shouldOpen: boolean): void => {
+        const button = item.querySelector<HTMLButtonElement>("[data-faq-button]");
+        const panel = item.querySelector<HTMLElement>("[data-faq-panel]");
+        const title = item.querySelector<HTMLElement>("[data-faq-title]");
+        const iconWrap = item.querySelector<HTMLElement>("[data-faq-icon-wrap]");
+        const icon = item.querySelector<MorphIconElement>("[data-faq-icon]");
+        const accentLine = item.querySelector<HTMLElement>(
+          "[data-faq-accent-line]",
+        );
+
+        if (!button || !panel || !title || !iconWrap || !icon || !accentLine) {
+          return;
+        }
+
+        const isOpen = button.getAttribute("aria-expanded") === "true";
+        if (isOpen === shouldOpen) {
+          return;
+        }
+
+        button.setAttribute("aria-expanded", String(shouldOpen));
+        item.dataset.open = String(shouldOpen);
+        title.classList.toggle("text-theme-accent", shouldOpen);
+        title.classList.toggle("text-theme-foreground", !shouldOpen);
+        iconWrap.classList.toggle("text-theme-accent", shouldOpen);
+        iconWrap.classList.toggle("text-theme-foreground", !shouldOpen);
+        icon.morphTo(shouldOpen ? CircleX : CirclePlus);
+
+        gsap.killTweensOf([panel, accentLine]);
+
+        if (shouldOpen) {
+          panel.hidden = false;
+          gsap.set(panel, { height: panel.offsetHeight === 0 ? 0 : panel.offsetHeight });
+          gsap.to(panel, {
+            height: "auto",
+            autoAlpha: 1,
+            duration,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+          gsap.to(accentLine, {
+            scaleX: 1,
+            duration,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+          return;
+        }
+
+        gsap.to(panel, {
+          height: 0,
+          autoAlpha: 0,
+          duration: reduceMotion ? 0 : 0.3,
+          ease: "power2.inOut",
+          overwrite: "auto",
+          onComplete: () => {
+            panel.hidden = true;
+          },
+        });
+        gsap.to(accentLine, {
+          scaleX: 0,
+          duration: reduceMotion ? 0 : 0.3,
+          ease: "power2.inOut",
+          overwrite: "auto",
+        });
+      };
+
+      items.forEach((item) => {
+        const button = item.querySelector<HTMLButtonElement>("[data-faq-button]");
+        const panel = item.querySelector<HTMLElement>("[data-faq-panel]");
+        const accentLine = item.querySelector<HTMLElement>(
+          "[data-faq-accent-line]",
+        );
+
+        if (!button || !panel || !accentLine) {
+          return;
+        }
+
+        const startsOpen = button.getAttribute("aria-expanded") === "true";
+        gsap.set(panel, {
+          height: startsOpen ? "auto" : 0,
+          autoAlpha: startsOpen ? 1 : 0,
+        });
+        gsap.set(accentLine, { scaleX: startsOpen ? 1 : 0 });
+
+        const handleClick = (): void => {
+          const shouldOpen = button.getAttribute("aria-expanded") !== "true";
+
+          items.forEach((candidate) => {
+            setItemState(candidate, candidate === item && shouldOpen);
+          });
+        };
+
+        button.addEventListener("click", handleClick);
+        cleanups.push(() => button.removeEventListener("click", handleClick));
+      });
+
+      const cleanup = (): void => {
+        cleanups.forEach((removeListener) => removeListener());
+        gsap.killTweensOf(
+          root.querySelectorAll("[data-faq-panel], [data-faq-accent-line]"),
+        );
+        root.dataset.faqInitialized = "false";
+        document.removeEventListener("astro:before-swap", cleanup);
+      };
+
+      document.addEventListener("astro:before-swap", cleanup, { once: true });
+    });
+  };
+
+  initFaqAccordions();
+</script>
