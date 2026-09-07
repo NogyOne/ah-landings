@@ -1,0 +1,370 @@
+---
+import { Image } from "astro:assets";
+import "leaflet/dist/leaflet.css";
+import MorphIcon from "morphicons/astro";
+import { Clock10, MapPin, Phone, Smartphone } from "lucide";
+import logo from "@assets/images/brand/logo-nbg.webp";
+import SectionContainer from "@ui/SectionContainer.astro";
+
+const latitude = 25.5611903;
+const longitude = -108.4632454;
+const mapsUrl =
+  "https://www.google.com/maps/search/?api=1&query=Joyer%C3%ADa%20Halisco%2C%20Vicente%20Guerrero%20575%2C%20Centro%2C%20Guasave%2C%20Sinaloa";
+---
+
+<SectionContainer
+  id="visit"
+  aria-labelledby="visit-title"
+  class="overflow-hidden bg-[#15110F] py-20 lg:py-24"
+  innerClass="max-w-none lg:px-16"
+>
+  <div class="grid gap-14 lg:grid-cols-12 lg:items-stretch lg:gap-16">
+    <div class="lg:col-span-5">
+      <header>
+        <p
+          class="mb-4 font-body text-xs font-light tracking-[4px] text-theme-accent"
+        >
+          VISÍTANOS
+        </p>
+        <h2
+          id="visit-title"
+          class="m-0 max-w-3xl font-display text-[34px] font-medium leading-[1.08] tracking-tight text-theme-foreground lg:text-5xl"
+        >
+          Acude a nuestra sucursal y conoce de cerca la calidad de nuestro
+          trabajo.
+        </h2>
+        <p
+          class="m-0 mt-7 max-w-xl font-body text-base leading-[1.65] text-theme-muted lg:text-lg"
+        >
+          Visítanos para conocer piezas disponibles, revisar una reparación o
+          conversar sobre una hechura con el contexto que cada trabajo necesita.
+        </p>
+      </header>
+
+      <address class="mt-10 not-italic">
+        <ul class="m-0 grid list-none gap-5 p-0">
+          <li class="grid grid-cols-[2.5rem_minmax(0,1fr)] items-start gap-4">
+            <span
+              class="flex h-10 w-10 items-center justify-center text-theme-accent"
+              aria-hidden="true"
+            >
+              <MorphIcon icon={MapPin} />
+            </span>
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noreferrer"
+              class="min-h-10 self-center font-body text-base leading-[1.5] text-theme-foreground underline decoration-theme-divider underline-offset-4 transition-colors duration-300 hover:text-theme-accent focus-visible:text-theme-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent"
+            >
+              Vicente Guerrero 575, Centro, 81000 Guasave, Sin., México
+            </a>
+          </li>
+
+          <li class="grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-4">
+            <span
+              class="flex h-10 w-10 items-center justify-center text-theme-accent"
+              aria-hidden="true"
+            >
+              <MorphIcon icon={Phone} />
+            </span>
+            <a
+              href="tel:+526878722554"
+              class="font-body text-base text-theme-foreground transition-colors duration-300 hover:text-theme-accent focus-visible:text-theme-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent"
+            >
+              +52 687 872 2554
+            </a>
+          </li>
+
+          <li class="grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-4">
+            <span
+              class="flex h-10 w-10 items-center justify-center text-theme-accent"
+              aria-hidden="true"
+            >
+              <MorphIcon icon={Smartphone} />
+            </span>
+            <a
+              href="https://wa.me/526871908152"
+              target="_blank"
+              rel="noreferrer"
+              class="font-body text-base text-theme-foreground transition-colors duration-300 hover:text-theme-accent focus-visible:text-theme-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent"
+            >
+              WhatsApp: +52 687 190 8152
+            </a>
+          </li>
+
+          <li class="grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-4">
+            <span
+              class="flex h-10 w-10 items-center justify-center text-theme-accent"
+              aria-hidden="true"
+            >
+              <MorphIcon icon={Clock10} />
+            </span>
+            <p
+              class="m-0 font-body text-base leading-[1.5] text-theme-foreground"
+            >
+              Lunes a sábado · 10:00 a.m.–7:00 p.m.
+            </p>
+          </li>
+        </ul>
+      </address>
+
+      <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex min-h-13 items-center justify-center bg-theme-accent px-7 font-body text-sm font-semibold tracking-[0.12em] text-theme-on-accent no-underline transition-colors duration-300 hover:bg-theme-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent"
+        >
+          CÓMO LLEGAR
+        </a>
+        <a
+          id="whatsapp"
+          href="https://wa.me/526871908152"
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex min-h-13 items-center justify-center border border-theme-accent px-7 font-body text-sm font-semibold tracking-[0.12em] text-theme-foreground no-underline transition-colors duration-300 hover:bg-theme-accent hover:text-theme-on-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent"
+        >
+          ESCRIBIR POR WHATSAPP
+        </a>
+      </div>
+    </div>
+
+    <div
+      class="relative isolate min-h-[360px] overflow-hidden border border-theme-accent/20 bg-theme-background shadow-[0_20px_60px_rgba(0,0,0,0.45)] lg:col-span-7 lg:min-h-[600px]"
+    >
+      <div
+        class="absolute inset-0 z-10 flex items-center justify-center bg-theme-background px-8 text-center transition-opacity duration-300"
+        data-map-status
+      >
+        <p
+          class="m-0 max-w-xs font-body text-sm leading-relaxed text-theme-muted"
+        >
+          Cargando ubicación de Halisco Joyería…
+        </p>
+      </div>
+      <div
+        class="h-full min-h-[360px] w-full lg:min-h-[600px]"
+        data-halisco-map
+        data-latitude={latitude}
+        data-longitude={longitude}
+        data-zoom="17"
+        role="region"
+        aria-label="Mapa con la ubicación de Halisco Joyería en Guasave"
+      >
+      </div>
+    </div>
+  </div>
+
+  <footer
+    class="mt-16 flex flex-col gap-7 border-t border-theme-divider/60 pt-10 sm:flex-row sm:items-end sm:justify-between"
+  >
+    <p class="m-0 font-body text-sm leading-relaxed text-theme-muted">
+      Joyería física · Hechuras · Reparaciones · Relojería
+    </p>
+    <Image
+      src={logo}
+      alt="Halisco Joyería"
+      width={220}
+      height={96}
+      quality={90}
+      loading="lazy"
+      class="h-auto w-44 object-contain object-left sm:w-52 sm:object-right"
+    />
+  </footer>
+</SectionContainer>
+
+<style is:global>
+  [data-halisco-map].leaflet-container {
+    background: #0d0d0c;
+    font-family: var(--font-body);
+  }
+
+  [data-halisco-map] .leaflet-tile-pane {
+    filter: grayscale(1) brightness(0.78) contrast(1.1);
+  }
+
+  [data-halisco-map] .leaflet-control-zoom a {
+    border-color: color-mix(
+      in srgb,
+      var(--color-theme-accent) 28%,
+      transparent
+    );
+    background: #15110f;
+    color: var(--color-theme-foreground);
+  }
+
+  [data-halisco-map] .leaflet-control-zoom a:hover,
+  [data-halisco-map] .leaflet-control-zoom a:focus {
+    background: var(--color-theme-accent);
+    color: var(--color-theme-on-accent);
+  }
+
+  [data-halisco-map] .leaflet-control-attribution {
+    background: rgb(13 13 12 / 82%);
+    color: var(--color-theme-muted);
+  }
+
+  [data-halisco-map] .leaflet-control-attribution a {
+    color: var(--color-theme-accent);
+  }
+
+  [data-halisco-map] .leaflet-popup-content-wrapper,
+  [data-halisco-map] .leaflet-popup-tip {
+    border-radius: 0;
+    background: #15110f;
+    color: var(--color-theme-foreground);
+  }
+
+  [data-halisco-map] .leaflet-popup-content-wrapper {
+    border: 1px solid
+      color-mix(in srgb, var(--color-theme-accent) 35%, transparent);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 45%);
+  }
+
+  [data-halisco-map] .leaflet-popup-content {
+    margin: 1rem 1.15rem;
+    font-family: var(--font-body);
+    line-height: 1.5;
+  }
+
+  [data-halisco-map] .leaflet-popup-close-button {
+    color: var(--color-theme-muted);
+  }
+
+  [data-halisco-map] .leaflet-popup-close-button:hover,
+  [data-halisco-map] .leaflet-popup-close-button:focus {
+    color: var(--color-theme-accent);
+  }
+
+  .halisco-map-marker {
+    border: 0;
+    background: transparent;
+  }
+</style>
+
+<script>
+  import type { Map as LeafletMap } from "leaflet";
+
+  let leafletPromise: Promise<typeof import("leaflet")> | null = null;
+
+  const loadLeaflet = (): Promise<typeof import("leaflet")> => {
+    leafletPromise ??= import("leaflet");
+    return leafletPromise;
+  };
+
+  const markerSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 62" width="48" height="62" aria-hidden="true">
+      <defs>
+        <filter id="halisco-pin-shadow" x="-40%" y="-20%" width="180%" height="170%">
+          <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.55)" />
+        </filter>
+      </defs>
+      <path d="M24 2C12.95 2 4 10.95 4 22c0 13.5 17.7 34.8 19.2 36.55a1.05 1.05 0 0 0 1.6 0C26.3 56.8 44 35.5 44 22 44 10.95 35.05 2 24 2Z" fill="#15110F" stroke="#EFBA20" stroke-width="2" filter="url(#halisco-pin-shadow)" />
+      <circle cx="24" cy="22" r="7" fill="#EFBA20" />
+    </svg>
+  `;
+
+  const initLocationMaps = (): void => {
+    document
+      .querySelectorAll<HTMLElement>("[data-halisco-map]")
+      .forEach((element) => {
+        if (element.dataset.mapInitialized === "true") {
+          return;
+        }
+
+        element.dataset.mapInitialized = "true";
+        const status =
+          element.parentElement?.querySelector<HTMLElement>(
+            "[data-map-status]",
+          );
+        const latitude = Number(element.dataset.latitude);
+        const longitude = Number(element.dataset.longitude);
+        const zoom = Number(element.dataset.zoom);
+        let map: LeafletMap | null = null;
+        let observer: IntersectionObserver | null = null;
+
+        const enableScrollZoom = (): void => map?.scrollWheelZoom.enable();
+        const disableScrollZoom = (): void => map?.scrollWheelZoom.disable();
+
+        const showFailure = (): void => {
+          const statusText = status?.querySelector<HTMLParagraphElement>("p");
+
+          if (statusText) {
+            statusText.textContent =
+              "No pudimos cargar el mapa. Usa el botón “Cómo llegar” para abrir la ubicación.";
+          }
+        };
+
+        const createMap = async (): Promise<void> => {
+          try {
+            const L = await loadLeaflet();
+            map = L.map(element, {
+              center: [latitude, longitude],
+              zoom,
+              zoomControl: true,
+              scrollWheelZoom: false,
+              attributionControl: true,
+            });
+
+            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+              attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+              maxZoom: 19,
+            }).addTo(map);
+
+            const icon = L.divIcon({
+              html: markerSvg,
+              className: "halisco-map-marker",
+              iconSize: [48, 62],
+              iconAnchor: [24, 62],
+              popupAnchor: [0, -64],
+            });
+
+            L.marker([latitude, longitude], { icon })
+              .addTo(map)
+              .bindPopup(
+                '<strong style="color:#EFBA20;display:block;margin-bottom:0.35rem;">Halisco Joyería</strong><span>Vicente Guerrero 575<br>Centro, Guasave, Sinaloa</span>',
+              )
+              .openPopup();
+
+            element.addEventListener("focusin", enableScrollZoom);
+            element.addEventListener("click", enableScrollZoom);
+            element.addEventListener("mouseleave", disableScrollZoom);
+
+            window.setTimeout(() => map?.invalidateSize(), 100);
+            status?.classList.add("pointer-events-none", "opacity-0");
+          } catch {
+            showFailure();
+          }
+        };
+
+        observer = new IntersectionObserver(
+          (entries) => {
+            if (entries.some((entry) => entry.isIntersecting)) {
+              observer?.disconnect();
+              observer = null;
+              void createMap();
+            }
+          },
+          { rootMargin: "300px" },
+        );
+        observer.observe(element);
+
+        const cleanup = (): void => {
+          observer?.disconnect();
+          observer = null;
+          element.removeEventListener("focusin", enableScrollZoom);
+          element.removeEventListener("click", enableScrollZoom);
+          element.removeEventListener("mouseleave", disableScrollZoom);
+          map?.remove();
+          map = null;
+          element.dataset.mapInitialized = "false";
+          document.removeEventListener("astro:before-swap", cleanup);
+        };
+
+        document.addEventListener("astro:before-swap", cleanup, { once: true });
+      });
+  };
+
+  initLocationMaps();
+</script>
