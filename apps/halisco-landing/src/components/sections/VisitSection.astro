@@ -16,7 +16,7 @@ const mapsUrl =
   id="visit"
   aria-labelledby="visit-title"
   class="overflow-hidden bg-[#15110F] py-20 lg:py-24"
-  innerClass="max-w-none lg:px-16"
+  innerClass="max-w-[90rem] lg:px-12"
 >
   <div class="grid gap-14 lg:grid-cols-12 lg:items-stretch lg:gap-16">
     <div class="lg:col-span-5">
@@ -135,6 +135,10 @@ const mapsUrl =
       <div
         class="absolute inset-0 z-10 flex items-center justify-center bg-theme-background px-8 text-center transition-opacity duration-300"
         data-map-status
+        id="visit-map-status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
       >
         <p
           class="m-0 max-w-xs font-body text-sm leading-relaxed text-theme-muted"
@@ -150,6 +154,8 @@ const mapsUrl =
         data-zoom="17"
         role="region"
         aria-label="Mapa con la ubicación de Halisco Joyería en Guasave"
+        aria-describedby="visit-map-status"
+        aria-busy="true"
       >
       </div>
     </div>
@@ -184,6 +190,10 @@ const mapsUrl =
   }
 
   [data-halisco-map] .leaflet-control-zoom a {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    text-align: center;
     border-color: color-mix(
       in srgb,
       var(--color-theme-accent) 28%,
@@ -282,17 +292,41 @@ const mapsUrl =
         const zoom = Number(element.dataset.zoom);
         let map: LeafletMap | null = null;
         let observer: IntersectionObserver | null = null;
+        let tileState: "loading" | "loaded" | "error" = "loading";
+        const statusText = status?.querySelector<HTMLParagraphElement>("p");
 
         const enableScrollZoom = (): void => map?.scrollWheelZoom.enable();
         const disableScrollZoom = (): void => map?.scrollWheelZoom.disable();
 
         const showFailure = (): void => {
-          const statusText = status?.querySelector<HTMLParagraphElement>("p");
+          tileState = "error";
 
           if (statusText) {
             statusText.textContent =
               "No pudimos cargar el mapa. Usa el botón “Cómo llegar” para abrir la ubicación.";
           }
+
+          status?.classList.remove("pointer-events-none", "opacity-0");
+          element.setAttribute("aria-busy", "false");
+        };
+
+        const showSuccess = (): void => {
+          if (tileState === "error") {
+            return;
+          }
+
+          tileState = "loaded";
+
+          if (statusText) {
+            statusText.textContent = "Mapa cargado.";
+          }
+
+          element.setAttribute("aria-busy", "false");
+          window.requestAnimationFrame(() => {
+            if (tileState === "loaded") {
+              status?.classList.add("pointer-events-none", "opacity-0");
+            }
+          });
         };
 
         const createMap = async (): Promise<void> => {
@@ -301,16 +335,26 @@ const mapsUrl =
             map = L.map(element, {
               center: [latitude, longitude],
               zoom,
-              zoomControl: true,
+              zoomControl: false,
               scrollWheelZoom: false,
               attributionControl: true,
             });
 
-            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            L.control
+              .zoom({
+                zoomInTitle: "Acercar mapa",
+                zoomOutTitle: "Alejar mapa",
+              })
+              .addTo(map);
+
+            const tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
               attribution:
                 '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
               maxZoom: 19,
-            }).addTo(map);
+            });
+            tileLayer.on("load", showSuccess);
+            tileLayer.on("tileerror", showFailure);
+            tileLayer.addTo(map);
 
             const icon = L.divIcon({
               html: markerSvg,
@@ -332,7 +376,6 @@ const mapsUrl =
             element.addEventListener("mouseleave", disableScrollZoom);
 
             window.setTimeout(() => map?.invalidateSize(), 100);
-            status?.classList.add("pointer-events-none", "opacity-0");
           } catch {
             showFailure();
           }

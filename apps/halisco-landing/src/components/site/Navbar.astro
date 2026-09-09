@@ -10,6 +10,7 @@ const links = [
   { label: "REPARACIONES", href: "#repairs" },
   { label: "RELOJERÍA", href: "#watchmaking" },
   { label: "PREGUNTAS", href: "#questions" },
+  { label: "VISÍTANOS", href: "#visit" },
 ];
 ---
 
@@ -21,7 +22,7 @@ const links = [
     class="relative z-50 h-16 border-b border-theme-divider/55 bg-theme-on-accent/30 backdrop-blur-lg lg:h-18"
     aria-label="Navegación principal"
   >
-    <div class="flex h-full items-center pl-8 pr-5 lg:pl-60 lg:pr-24">
+    <div class="flex h-full items-center pl-8 pr-5 lg:pl-60 lg:pr-8 xl:pr-24">
       <a
         class="flex h-11 w-24 flex-none items-center overflow-hidden lg:h-12 lg:w-30"
         href="#hero"
@@ -39,12 +40,12 @@ const links = [
         />
       </a>
 
-      <ul class="m-0 ml-auto hidden list-none items-center gap-7 p-0 lg:flex">
+      <ul class="m-0 ml-auto hidden list-none items-center gap-4 p-0 lg:flex xl:gap-7">
         {
           links.map((link) => (
             <li>
               <a
-                class="nav-link inline-flex min-h-11 items-center font-body text-sm font-normal leading-5 tracking-widest whitespace-nowrap text-theme-foreground transition-colors duration-300 hover:text-theme-accent"
+                class="nav-link inline-flex min-h-11 items-center whitespace-nowrap font-body text-xs font-normal leading-5 tracking-widest text-theme-foreground transition-colors duration-300 hover:text-theme-accent xl:text-sm"
                 data-nav-link
                 data-nav-target={link.href.slice(1)}
                 href={link.href}
@@ -81,6 +82,8 @@ const links = [
     id="mobile-menu-panel"
     class="fixed inset-y-0 right-0 z-40 flex h-dvh w-[min(82vw,22rem)] translate-x-full flex-col border-l border-theme-divider/60 bg-theme-surface pt-[calc(4rem+env(safe-area-inset-top))] pb-[env(safe-area-inset-bottom)] text-theme-foreground shadow-2xl transition-transform duration-300 ease-out will-change-transform motion-reduce:transition-none lg:hidden"
     data-mobile-menu-panel
+    role="dialog"
+    aria-modal="true"
     aria-hidden="true"
     aria-label="Menú móvil"
     inert
@@ -115,6 +118,14 @@ const links = [
       const OVERLAY_SELECTOR = "[data-mobile-menu-overlay]";
       const PANEL_SELECTOR = "[data-mobile-menu-panel]";
       const LINK_SELECTOR = "[data-mobile-menu-link]";
+      const FOCUSABLE_PANEL_SELECTOR = [
+        "a[href]",
+        "button:not([disabled])",
+        "input:not([disabled])",
+        "select:not([disabled])",
+        "textarea:not([disabled])",
+        "[tabindex]:not([tabindex=\"-1\"])",
+      ].join(",");
 
       type MenuState = "open" | "closed";
 
@@ -188,6 +199,8 @@ const links = [
             navbar.dataset.mobileMenuInitialized = "true";
             let previousBodyOverflow = "";
             let previousDocumentOverflow = "";
+            let mainElement: HTMLElement | null = null;
+            let previousMainInert = false;
 
             const media = gsap.matchMedia();
             let linkTimeline: gsap.core.Timeline | null = null;
@@ -262,17 +275,56 @@ const links = [
               document.documentElement.style.overflow = previousDocumentOverflow;
             };
 
+            const lockMainContent = (): void => {
+              mainElement = document.querySelector<HTMLElement>("main");
+
+              if (!mainElement) {
+                return;
+              }
+
+              previousMainInert = mainElement.hasAttribute("inert");
+              mainElement.setAttribute("inert", "");
+            };
+
+            const restoreMainContent = (): void => {
+              if (!mainElement) {
+                return;
+              }
+
+              mainElement.toggleAttribute("inert", previousMainInert);
+              mainElement = null;
+            };
+
+            const focusFirstMenuLink = (): void => {
+              window.requestAnimationFrame(() => {
+                if (navbar.dataset.mobileMenuState === "open") {
+                  links[0]?.focus({ preventScroll: true });
+                }
+              });
+            };
+
+            const getFocusablePanelControls = (): HTMLElement[] =>
+              Array.from(
+                panel.querySelectorAll<HTMLElement>(FOCUSABLE_PANEL_SELECTOR),
+              ).filter(
+                (control) =>
+                  !control.hasAttribute("hidden") &&
+                  control.getClientRects().length > 0,
+              );
+
             const openMenu = (): void => {
               if (navbar.dataset.mobileMenuState === "open") {
                 return;
               }
 
               lockPageScroll();
+              lockMainContent();
               setMenuState(navbar, panel, overlay, toggleButton, morphIcon, "open");
               dispatchMenuEvent(navbar, "open");
+              focusFirstMenuLink();
             };
 
-            const closeMenu = (): void => {
+            const closeMenu = (restoreFocus = true): void => {
               if (navbar.dataset.mobileMenuState !== "open") {
                 return;
               }
@@ -280,7 +332,8 @@ const links = [
               const focusIsInsidePanel = panel.contains(document.activeElement);
               setMenuState(navbar, panel, overlay, toggleButton, morphIcon, "closed");
               unlockPageScroll();
-              if (focusIsInsidePanel) {
+              restoreMainContent();
+              if (restoreFocus && focusIsInsidePanel) {
                 toggleButton.focus({ preventScroll: true });
               }
               dispatchMenuEvent(navbar, "closed");
@@ -295,23 +348,60 @@ const links = [
               openMenu();
             };
 
+            const handleMenuKeydown = (event: KeyboardEvent): void => {
+              if (
+                event.key === "Escape" &&
+                navbar.dataset.mobileMenuState === "open"
+              ) {
+                closeMenu();
+                return;
+              }
+
+              if (
+                event.key !== "Tab" ||
+                navbar.dataset.mobileMenuState !== "open"
+              ) {
+                return;
+              }
+
+              const focusableControls = getFocusablePanelControls();
+
+              if (focusableControls.length === 0) {
+                event.preventDefault();
+                return;
+              }
+
+              const firstControl = focusableControls[0];
+              const lastControl = focusableControls.at(-1);
+              const activeElementIsOutsidePanel = !panel.contains(
+                document.activeElement,
+              );
+
+              if (
+                activeElementIsOutsidePanel ||
+                (event.shiftKey && document.activeElement === firstControl) ||
+                (!event.shiftKey && document.activeElement === lastControl)
+              ) {
+                event.preventDefault();
+                (event.shiftKey ? lastControl : firstControl).focus({
+                  preventScroll: true,
+                });
+              }
+            };
+
             setMenuState(navbar, panel, overlay, toggleButton, morphIcon, "closed");
             toggleButton.addEventListener("click", toggleMenu);
             links.forEach((link) => {
-              link.addEventListener("click", closeMenu);
+              link.addEventListener("click", () => closeMenu(false));
             });
-            navbar.addEventListener("keydown", (event: KeyboardEvent) => {
-              if (event.key === "Escape" && navbar.dataset.mobileMenuState === "open") {
-                closeMenu();
-              }
-            });
+            navbar.addEventListener("keydown", handleMenuKeydown);
 
             overlay.addEventListener("click", () => closeMenu());
 
             const desktopMedia = window.matchMedia("(min-width: 64rem)");
             desktopMedia.addEventListener("change", (event: MediaQueryListEvent) => {
               if (event.matches) {
-                closeMenu();
+                closeMenu(false);
               }
             });
           });
