@@ -5,6 +5,7 @@ import MorphIcon from "morphicons/astro";
 import { Clock10, MapPin, Phone, Smartphone } from "lucide";
 import logo from "@assets/images/brand/logo-nbg.webp";
 import SectionContainer from "@ui/SectionContainer.astro";
+import Button from "@/components/ui/Button.astro";
 
 const latitude = 25.5611903;
 const longitude = -108.4632454;
@@ -65,21 +66,6 @@ const mapsUrl =
               class="flex h-10 w-10 items-center justify-center text-theme-accent"
               aria-hidden="true"
             >
-              <MorphIcon icon={Phone} />
-            </span>
-            <a
-              href="tel:+526878722554"
-              class="font-body text-base text-theme-foreground transition-colors duration-300 hover:text-theme-accent focus-visible:text-theme-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent"
-            >
-              +52 687 872 2554
-            </a>
-          </li>
-
-          <li class="grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-4">
-            <span
-              class="flex h-10 w-10 items-center justify-center text-theme-accent"
-              aria-hidden="true"
-            >
               <MorphIcon icon={Smartphone} />
             </span>
             <a
@@ -109,23 +95,17 @@ const mapsUrl =
       </address>
 
       <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <a
+        <Button
           href={mapsUrl}
-          target="_blank"
-          rel="noreferrer"
-          class="inline-flex min-h-13 items-center justify-center bg-theme-accent px-7 font-body text-sm font-semibold tracking-[0.12em] text-theme-on-accent no-underline transition-colors duration-300 hover:bg-theme-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent"
-        >
-          CÓMO LLEGAR
-        </a>
-        <a
-          id="whatsapp"
+          class="min-w-0 flex-1 px-2 text-[10px] md:flex-none md:px-5 md:text-xs"
+          label="CÓMO LLEGAR"
+        />
+        <Button
+          class="min-w-0 flex-1 px-2 text-[10px] md:flex-none md:px-5 md:text-xs"
+          label="ESCRIBIR POR WHATSAPP"
           href="https://wa.me/526871908152"
-          target="_blank"
-          rel="noreferrer"
-          class="inline-flex min-h-13 items-center justify-center border border-theme-accent px-7 font-body text-sm font-semibold tracking-[0.12em] text-theme-foreground no-underline transition-colors duration-300 hover:bg-theme-accent hover:text-theme-on-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-theme-accent"
-        >
-          ESCRIBIR POR WHATSAPP
-        </a>
+          variant="secondary"
+        />
       </div>
     </div>
 
@@ -164,9 +144,11 @@ const mapsUrl =
   <footer
     class="mt-16 flex flex-col gap-7 border-t border-theme-divider/60 pt-10 sm:flex-row sm:items-end sm:justify-between"
   >
-    <p class="m-0 font-body text-sm leading-relaxed text-theme-muted">
-      Joyería física · Hechuras · Reparaciones · Relojería
-    </p>
+    <div class="inline-block border border-theme-accent px-6 py-2">
+      <p class="text-xs text-theme-muted font-serif">
+        © {new Date().getFullYear()} Joyería Halisco. Todos los derechos reservados.
+      </p>
+    </div>
     <Image
       src={logo}
       alt="Halisco Joyería"
@@ -174,7 +156,7 @@ const mapsUrl =
       height={96}
       quality={90}
       loading="lazy"
-      class="h-auto w-44 object-contain object-left sm:w-52 sm:object-right"
+      class="h-auto w-20 object-contain object-left sm:w-20 sm:object-right"
     />
   </footer>
 </SectionContainer>
@@ -347,11 +329,14 @@ const mapsUrl =
               })
               .addTo(map);
 
-            const tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-              attribution:
-                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-              maxZoom: 19,
-            });
+            const tileLayer = L.tileLayer(
+              "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              {
+                attribution:
+                  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+                maxZoom: 19,
+              },
+            );
             tileLayer.on("load", showSuccess);
             tileLayer.on("tileerror", showFailure);
             tileLayer.addTo(map);
