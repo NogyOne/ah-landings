@@ -34,7 +34,10 @@ const { title, description } = Astro.props;
 			FORM: Approved OpenPencil Halisco V2 desktop composition from halisco-mockups Page 1, nodes 0:217 and 0:230; no new visual-direction roll is introduced in this bounded implementation slice.
 			FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 		-->
-		<Navbar />
-		<slot />
-	</body>
+			<Navbar />
+			<slot />
+			<script>
+				import "../scripts/section-entrance";
+			</script>
+		</body>
 </html>
