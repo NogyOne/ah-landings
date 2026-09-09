@@ -5,34 +5,34 @@ import SectionContainer from "@ui/SectionContainer.astro";
 
 const faqs = [
   {
-    question: "¿Qué diferencia hay entre oro 10k y 14k?",
+    question: "¿Qué es el kilataje en el Oro?",
     answer:
       "El kilataje indica la proporción de oro dentro de la aleación. Esa diferencia influye en color, dureza, uso y presupuesto; te orientamos según la pieza que buscas o el trabajo que necesitas.",
   },
   {
     question: "¿Puedo llevar mi propio oro o plata?",
     answer:
-      "Podemos revisar el material y valorar si es adecuado para el trabajo que buscas. La viabilidad depende de su estado, pureza, cantidad y del diseño, por eso la confirmación se realiza después de evaluarlo físicamente.",
+      "Si. Podemos revisar los metales y valorar si es adecuado para el trabajo que buscas. Todo depende de su cantidad y calidad, por eso la confirmación se realiza después de evaluarlo físicamente.",
   },
   {
-    question: "¿Cómo se considera la merma?",
+    question: "¿Qué es la merma en los trabajos de Joyería?",
     answer:
-      "Cada proceso puede generar una merma distinta. Antes de comenzar revisamos el material y el tipo de trabajo para explicarte qué puede recuperarse y qué variación debe contemplarse.",
+      "Todo trabajo de Joyería al ser terminado tiene una merma del 10% con relación al metal utilizado en la orden. Esto se debe a que el metal se pierde en el proceso de fundición, pulido y acabado. En nuestro proceso, al tratarse de trabajos manuales el peso neto de la prenda final puede variar.",
   },
   {
     question: "¿Pueden trabajar desde una referencia?",
     answer:
-      "Sí, una referencia puede ayudarnos a entender la idea. Primero evaluamos medidas, material, complejidad, herramientas y acabados para confirmar qué podemos realizar y qué ajustes serían necesarios.",
+      "Sí, una referencia puede ayudarnos a entender la idea. Primero evaluamos la prenda de referencia para confirmar qué podemos realizarla y qué ajustes serían necesarios. No todos los trabajos son posibles de elaborar.",
   },
   {
     question: "¿Necesitan revisar físicamente una reparación?",
     answer:
-      "Sí. Una fotografía sirve como primer acercamiento, pero el diagnóstico, el alcance y la cotización final requieren revisar la pieza directamente en el taller.",
+      "Sí. Una fotografía sirve como primer acercamiento, pero el diagnóstico, el alcance y la cotización final requieren revisar la pieza directamente en sucursal.",
   },
   {
-    question: "¿Qué envío para cotizar por WhatsApp?",
+    question: "¿Es posible cotizar por WhatsApp?",
     answer:
-      "Envía fotografías claras desde varios ángulos y cuéntanos qué pieza es, qué material conoces y qué necesitas. Con eso podemos orientarte antes de confirmar los detalles al verla físicamente.",
+      "Si, por Whatsapp puedes hacernos llegar la información de la prenda que te gustaría reparar o elaborar. Puedes enviarnos fotos de referencias, medidas, el metal en que la deseas y cualquier detalle que consideres importante. Te responderemos con la información que podamos darte, pero la confirmación final de alcance y presupuesto se realiza en sucursal.",
   },
 ] as const;
 
@@ -42,7 +42,7 @@ const columns = [faqs.slice(0, 3), faqs.slice(3)];
 <SectionContainer
   id="questions"
   aria-labelledby="faq-title"
-  class="bg-theme-background py-20 lg:py-24"
+  class="bg-theme-surface py-20 lg:py-24"
   innerClass="max-w-[90rem] lg:px-12"
 >
   <header class="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-20">
@@ -105,9 +105,7 @@ const columns = [faqs.slice(0, 3), faqs.slice(3)];
                     <span
                       class:list={[
                         "min-w-0 font-body text-[17px] font-bold leading-[1.4] transition-colors duration-300 lg:text-[19px]",
-                        isOpen
-                          ? "text-theme-accent"
-                          : "text-theme-foreground",
+                        isOpen ? "text-theme-accent" : "text-theme-foreground",
                       ]}
                       data-faq-title
                     >
@@ -117,9 +115,7 @@ const columns = [faqs.slice(0, 3), faqs.slice(3)];
                     <span
                       class:list={[
                         "flex h-11 w-11 shrink-0 items-center justify-center justify-self-end transition-colors duration-300",
-                        isOpen
-                          ? "text-theme-accent"
-                          : "text-theme-foreground",
+                        isOpen ? "text-theme-accent" : "text-theme-foreground",
                       ]}
                       data-faq-icon-wrap
                       aria-hidden="true"
@@ -140,9 +136,7 @@ const columns = [faqs.slice(0, 3), faqs.slice(3)];
                   data-faq-panel
                   hidden={!isOpen}
                 >
-                  <p
-                    class="m-0 max-w-[58ch] pb-7 pr-[3.75rem] font-body text-[15px] leading-[1.65] text-theme-muted lg:text-base"
-                  >
+                  <p class="m-0 max-w-[58ch] pb-7 pr-[3.75rem] font-body text-[15px] leading-[1.65] text-theme-muted lg:text-base">
                     {faq.answer}
                   </p>
                 </div>
@@ -161,133 +155,148 @@ const columns = [faqs.slice(0, 3), faqs.slice(3)];
   import { gsap } from "gsap";
 
   const initFaqAccordions = (): void => {
-    document.querySelectorAll<HTMLElement>("[data-faq-root]").forEach((root) => {
-      if (root.dataset.faqInitialized === "true") {
-        return;
-      }
+    document
+      .querySelectorAll<HTMLElement>("[data-faq-root]")
+      .forEach((root) => {
+        if (root.dataset.faqInitialized === "true") {
+          return;
+        }
 
-      const items = Array.from(
-        root.querySelectorAll<HTMLElement>("[data-faq-item]"),
-      );
-
-      if (items.length === 0) {
-        return;
-      }
-
-      root.dataset.faqInitialized = "true";
-      const reduceMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      const duration = reduceMotion ? 0 : 0.38;
-      const cleanups: Array<() => void> = [];
-
-      const setItemState = (item: HTMLElement, shouldOpen: boolean): void => {
-        const button = item.querySelector<HTMLButtonElement>("[data-faq-button]");
-        const panel = item.querySelector<HTMLElement>("[data-faq-panel]");
-        const title = item.querySelector<HTMLElement>("[data-faq-title]");
-        const iconWrap = item.querySelector<HTMLElement>("[data-faq-icon-wrap]");
-        const icon = item.querySelector<MorphIconElement>("[data-faq-icon]");
-        const accentLine = item.querySelector<HTMLElement>(
-          "[data-faq-accent-line]",
+        const items = Array.from(
+          root.querySelectorAll<HTMLElement>("[data-faq-item]"),
         );
 
-        if (!button || !panel || !title || !iconWrap || !icon || !accentLine) {
+        if (items.length === 0) {
           return;
         }
 
-        const isOpen = button.getAttribute("aria-expanded") === "true";
-        if (isOpen === shouldOpen) {
-          return;
-        }
+        root.dataset.faqInitialized = "true";
+        const reduceMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        const duration = reduceMotion ? 0 : 0.38;
+        const cleanups: Array<() => void> = [];
 
-        button.setAttribute("aria-expanded", String(shouldOpen));
-        item.dataset.open = String(shouldOpen);
-        title.classList.toggle("text-theme-accent", shouldOpen);
-        title.classList.toggle("text-theme-foreground", !shouldOpen);
-        iconWrap.classList.toggle("text-theme-accent", shouldOpen);
-        iconWrap.classList.toggle("text-theme-foreground", !shouldOpen);
-        icon.morphTo(shouldOpen ? CircleX : CirclePlus);
+        const setItemState = (item: HTMLElement, shouldOpen: boolean): void => {
+          const button =
+            item.querySelector<HTMLButtonElement>("[data-faq-button]");
+          const panel = item.querySelector<HTMLElement>("[data-faq-panel]");
+          const title = item.querySelector<HTMLElement>("[data-faq-title]");
+          const iconWrap = item.querySelector<HTMLElement>(
+            "[data-faq-icon-wrap]",
+          );
+          const icon = item.querySelector<MorphIconElement>("[data-faq-icon]");
+          const accentLine = item.querySelector<HTMLElement>(
+            "[data-faq-accent-line]",
+          );
 
-        gsap.killTweensOf([panel, accentLine]);
+          if (
+            !button ||
+            !panel ||
+            !title ||
+            !iconWrap ||
+            !icon ||
+            !accentLine
+          ) {
+            return;
+          }
 
-        if (shouldOpen) {
-          panel.hidden = false;
-          gsap.set(panel, { height: panel.offsetHeight === 0 ? 0 : panel.offsetHeight });
+          const isOpen = button.getAttribute("aria-expanded") === "true";
+          if (isOpen === shouldOpen) {
+            return;
+          }
+
+          button.setAttribute("aria-expanded", String(shouldOpen));
+          item.dataset.open = String(shouldOpen);
+          title.classList.toggle("text-theme-accent", shouldOpen);
+          title.classList.toggle("text-theme-foreground", !shouldOpen);
+          iconWrap.classList.toggle("text-theme-accent", shouldOpen);
+          iconWrap.classList.toggle("text-theme-foreground", !shouldOpen);
+          icon.morphTo(shouldOpen ? CircleX : CirclePlus);
+
+          gsap.killTweensOf([panel, accentLine]);
+
+          if (shouldOpen) {
+            panel.hidden = false;
+            gsap.set(panel, {
+              height: panel.offsetHeight === 0 ? 0 : panel.offsetHeight,
+            });
+            gsap.to(panel, {
+              height: "auto",
+              autoAlpha: 1,
+              duration,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+            gsap.to(accentLine, {
+              scaleX: 1,
+              duration,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+            return;
+          }
+
           gsap.to(panel, {
-            height: "auto",
-            autoAlpha: 1,
-            duration,
-            ease: "power2.out",
+            height: 0,
+            autoAlpha: 0,
+            duration: reduceMotion ? 0 : 0.3,
+            ease: "power2.inOut",
             overwrite: "auto",
+            onComplete: () => {
+              panel.hidden = true;
+            },
           });
           gsap.to(accentLine, {
-            scaleX: 1,
-            duration,
-            ease: "power2.out",
+            scaleX: 0,
+            duration: reduceMotion ? 0 : 0.3,
+            ease: "power2.inOut",
             overwrite: "auto",
-          });
-          return;
-        }
-
-        gsap.to(panel, {
-          height: 0,
-          autoAlpha: 0,
-          duration: reduceMotion ? 0 : 0.3,
-          ease: "power2.inOut",
-          overwrite: "auto",
-          onComplete: () => {
-            panel.hidden = true;
-          },
-        });
-        gsap.to(accentLine, {
-          scaleX: 0,
-          duration: reduceMotion ? 0 : 0.3,
-          ease: "power2.inOut",
-          overwrite: "auto",
-        });
-      };
-
-      items.forEach((item) => {
-        const button = item.querySelector<HTMLButtonElement>("[data-faq-button]");
-        const panel = item.querySelector<HTMLElement>("[data-faq-panel]");
-        const accentLine = item.querySelector<HTMLElement>(
-          "[data-faq-accent-line]",
-        );
-
-        if (!button || !panel || !accentLine) {
-          return;
-        }
-
-        const startsOpen = button.getAttribute("aria-expanded") === "true";
-        gsap.set(panel, {
-          height: startsOpen ? "auto" : 0,
-          autoAlpha: startsOpen ? 1 : 0,
-        });
-        gsap.set(accentLine, { scaleX: startsOpen ? 1 : 0 });
-
-        const handleClick = (): void => {
-          const shouldOpen = button.getAttribute("aria-expanded") !== "true";
-
-          items.forEach((candidate) => {
-            setItemState(candidate, candidate === item && shouldOpen);
           });
         };
 
-        button.addEventListener("click", handleClick);
-        cleanups.push(() => button.removeEventListener("click", handleClick));
+        items.forEach((item) => {
+          const button =
+            item.querySelector<HTMLButtonElement>("[data-faq-button]");
+          const panel = item.querySelector<HTMLElement>("[data-faq-panel]");
+          const accentLine = item.querySelector<HTMLElement>(
+            "[data-faq-accent-line]",
+          );
+
+          if (!button || !panel || !accentLine) {
+            return;
+          }
+
+          const startsOpen = button.getAttribute("aria-expanded") === "true";
+          gsap.set(panel, {
+            height: startsOpen ? "auto" : 0,
+            autoAlpha: startsOpen ? 1 : 0,
+          });
+          gsap.set(accentLine, { scaleX: startsOpen ? 1 : 0 });
+
+          const handleClick = (): void => {
+            const shouldOpen = button.getAttribute("aria-expanded") !== "true";
+
+            items.forEach((candidate) => {
+              setItemState(candidate, candidate === item && shouldOpen);
+            });
+          };
+
+          button.addEventListener("click", handleClick);
+          cleanups.push(() => button.removeEventListener("click", handleClick));
+        });
+
+        const cleanup = (): void => {
+          cleanups.forEach((removeListener) => removeListener());
+          gsap.killTweensOf(
+            root.querySelectorAll("[data-faq-panel], [data-faq-accent-line]"),
+          );
+          root.dataset.faqInitialized = "false";
+          document.removeEventListener("astro:before-swap", cleanup);
+        };
+
+        document.addEventListener("astro:before-swap", cleanup, { once: true });
       });
-
-      const cleanup = (): void => {
-        cleanups.forEach((removeListener) => removeListener());
-        gsap.killTweensOf(
-          root.querySelectorAll("[data-faq-panel], [data-faq-accent-line]"),
-        );
-        root.dataset.faqInitialized = "false";
-        document.removeEventListener("astro:before-swap", cleanup);
-      };
-
-      document.addEventListener("astro:before-swap", cleanup, { once: true });
-    });
   };
 
   initFaqAccordions();
