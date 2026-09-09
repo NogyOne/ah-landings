@@ -17,7 +17,7 @@ const services = [
 <SectionContainer
   id="watchmaking"
   aria-labelledby="watchmaking-title"
-  class="overflow-hidden bg-theme-surface py-16 lg:py-20"
+  class="overflow-hidden bg-theme-surface py-16"
 >
   <div
     slot="background"
@@ -46,8 +46,8 @@ const services = [
       <p
         class="m-0 mt-6 max-w-xl font-body text-base font-normal leading-[1.6] text-theme-muted"
       >
-        Resolvemos servicios cotidianos y evaluamos el reloj antes de
-        confirmar trabajos de mayor alcance.
+        Resolvemos servicios cotidianos y evaluamos el reloj antes de confirmar
+        trabajos de mayor alcance.
       </p>
     </header>
 
@@ -79,8 +79,8 @@ const services = [
       <p
         class="m-0 mt-6 font-body text-base font-normal leading-[1.6] text-theme-muted"
       >
-        También contamos con relojes disponibles en aparador; puedes
-        visitarnos o escribirnos para conocer las opciones.
+        También contamos con relojes disponibles en aparador; puedes visitarnos
+        o escribirnos para conocer las opciones.
       </p>
       <div class="mt-6 lg:mt-8">
         <Button label="CONSULTAR RELOJERÍA" href="#whatsapp" />
@@ -103,13 +103,9 @@ const services = [
         return;
       }
 
-      const image = root.querySelector<HTMLElement>(
-        "[data-watchmaking-image]",
-      );
+      const image = root.querySelector<HTMLElement>("[data-watchmaking-image]");
       const grid = root.querySelector<HTMLElement>("[data-watchmaking-grid]");
-      const intro = root.querySelector<HTMLElement>(
-        "[data-watchmaking-intro]",
-      );
+      const intro = root.querySelector<HTMLElement>("[data-watchmaking-intro]");
       const details = root.querySelector<HTMLElement>(
         "[data-watchmaking-details]",
       );
