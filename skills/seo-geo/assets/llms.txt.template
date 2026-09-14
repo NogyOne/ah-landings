@@ -1,0 +1,25 @@
+<!-- TEMPLATE ONLY — replace every {{PLACEHOLDER}}, verify every statement and URL, then remove this warning before shipping. -->
+
+# {{VERIFIED_SITE_OR_BRAND_NAME}}
+
+> {{VERIFIED_ONE_SENTENCE_DESCRIPTION}}
+
+{{OPTIONAL_VERIFIED_CONTEXT_OR_USAGE_NOTE}}
+
+## Primary pages
+
+- [{{VERIFIED_PAGE_LABEL}}](https://{{CANONICAL_HOST}}/{{VERIFIED_PATH}}): {{VERIFIED_PAGE_PURPOSE}}
+- [{{VERIFIED_PAGE_LABEL}}](https://{{CANONICAL_HOST}}/{{VERIFIED_PATH}}): {{VERIFIED_PAGE_PURPOSE}}
+
+## Business facts
+
+- Name: {{VERIFIED_PUBLIC_NAME}}
+- Offers: {{VERIFIED_PRODUCTS_OR_SERVICES}}
+- Locations or service area: {{VERIFIED_LOCATIONS_OR_SERVICE_AREA}}
+- Contact: {{VERIFIED_CONTACT_URL_OR_CHANNEL}}
+
+## Optional
+
+- [{{VERIFIED_POLICY_OR_SOURCE_LABEL}}](https://{{VERIFIED_EXTERNAL_OR_INTERNAL_URL}}): {{VERIFIED_REASON_TO_READ}}
+
+<!-- Omit unknown facts, empty sections, and unverified links. This curated file complements HTML, robots.txt, and the sitemap; it does not replace them. -->

@@ -1,0 +1,76 @@
+/* TEMPLATE ONLY — this file is intentionally not production JSON-LD.
+   Replace every {{PLACEHOLDER}}, remove this warning, remove unverified properties,
+   validate the result, and ship it only on pages that visibly describe the entities. */
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://{{CANONICAL_HOST}}/#organization",
+      "name": "{{VERIFIED_BRAND_NAME}}",
+      "url": "https://{{CANONICAL_HOST}}/",
+      "logo": "https://{{CANONICAL_HOST}}/{{VERIFIED_LOGO_PATH}}",
+      "sameAs": [
+        "{{VERIFIED_OFFICIAL_PROFILE_URL}}"
+      ]
+    },
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_A_SLUG}}/#localbusiness",
+      "name": "{{VERIFIED_LOCATION_A_PUBLIC_NAME}}",
+      "url": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_A_SLUG}}/",
+      "parentOrganization": {
+        "@id": "https://{{CANONICAL_HOST}}/#organization"
+      },
+      "telephone": "{{VERIFIED_LOCATION_A_PHONE}}",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "{{VERIFIED_LOCATION_A_STREET}}",
+        "addressLocality": "{{VERIFIED_LOCATION_A_LOCALITY}}",
+        "addressRegion": "{{VERIFIED_LOCATION_A_REGION}}",
+        "postalCode": "{{VERIFIED_LOCATION_A_POSTAL_CODE}}",
+        "addressCountry": "{{VERIFIED_LOCATION_A_COUNTRY_CODE}}"
+      }
+    },
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_B_SLUG}}/#localbusiness",
+      "name": "{{VERIFIED_LOCATION_B_PUBLIC_NAME}}",
+      "url": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_B_SLUG}}/",
+      "parentOrganization": {
+        "@id": "https://{{CANONICAL_HOST}}/#organization"
+      },
+      "telephone": "{{VERIFIED_LOCATION_B_PHONE}}",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "{{VERIFIED_LOCATION_B_STREET}}",
+        "addressLocality": "{{VERIFIED_LOCATION_B_LOCALITY}}",
+        "addressRegion": "{{VERIFIED_LOCATION_B_REGION}}",
+        "postalCode": "{{VERIFIED_LOCATION_B_POSTAL_CODE}}",
+        "addressCountry": "{{VERIFIED_LOCATION_B_COUNTRY_CODE}}"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_A_SLUG}}/#webpage",
+      "url": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_A_SLUG}}/",
+      "about": {
+        "@id": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_A_SLUG}}/#localbusiness"
+      },
+      "mainEntity": {
+        "@id": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_A_SLUG}}/#localbusiness"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_B_SLUG}}/#webpage",
+      "url": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_B_SLUG}}/",
+      "about": {
+        "@id": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_B_SLUG}}/#localbusiness"
+      },
+      "mainEntity": {
+        "@id": "https://{{CANONICAL_HOST}}/locations/{{LOCATION_B_SLUG}}/#localbusiness"
+      }
+    }
+  ]
+}

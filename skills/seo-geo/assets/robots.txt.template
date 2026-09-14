@@ -1,0 +1,11 @@
+# TEMPLATE ONLY — replace every {{PLACEHOLDER}} and remove this warning before shipping.
+# Never invent hosts or disallow rules. Confirm crawl and privacy policy first.
+
+User-agent: *
+Allow: /
+
+# Use the exact deployed, canonical HTTPS origin and actual sitemap path.
+Sitemap: https://{{CANONICAL_HOST}}/{{SITEMAP_PATH}}
+
+# Add User-agent/Disallow rules only for verified crawl-control requirements.
+# robots.txt does not remove a URL from search results and is not access control.

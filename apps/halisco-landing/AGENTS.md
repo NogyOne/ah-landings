@@ -66,6 +66,7 @@ Do not claim or run `astro check`: `@astrojs/check` and TypeScript are not decla
 | `gsap-timeline` | Trigger: GSAP timeline, sequencing, keyframes, position parameter, labels, playback. Build maintainable multi-step animation choreography. | [SKILL.md](../../skills/gsap-timeline/SKILL.md) |
 | `gsap-utils` | Trigger: gsap.utils, clamp, mapRange, normalize, interpolate, random, snap, toArray, wrap, pipe. Apply GSAP utility helpers safely. | [SKILL.md](../../skills/gsap-utils/SKILL.md) |
 | `open-pencil` | Trigger: OpenPencil, .fig design, design inspection, design mutation. Use the configured MCP safely for Halisco design work. | [SKILL.md](../../skills/open-pencil/SKILL.md) |
+| `seo-geo` | Trigger: SEO audit, GEO audit, technical SEO, local SEO, structured data, hreflang, robots.txt, sitemap, metadata, AI search. Audit, apply, and verify evidence-based search quality without invented facts or ranking promises. | [SKILL.md](../../skills/seo-geo/SKILL.md) |
 | `typescript` | Trigger: TypeScript, .ts, Astro component types, strict typing. Apply safe TypeScript patterns in Halisco components. | [SKILL.md](../../skills/typescript/SKILL.md) |
 <!-- skill-sync:end -->
 
