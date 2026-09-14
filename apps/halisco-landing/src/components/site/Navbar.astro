@@ -407,6 +407,129 @@ const links = [
           });
       };
 
+      const NAVBAR_SCROLL_TOP_THRESHOLD = 64;
+      const DESKTOP_MEDIA_QUERY = "(min-width: 64rem)";
+      const MOBILE_MEDIA_QUERY = "(max-width: 63.999rem)";
+
+      const initNavbarScrollAnimation = (): void => {
+        document
+          .querySelectorAll<HTMLElement>(NAVBAR_SELECTOR)
+          .forEach((navbar) => {
+            if (navbar.dataset.navbarScrollInitialized === "true") {
+              return;
+            }
+
+            navbar.dataset.navbarScrollInitialized = "true";
+
+            const media = gsap.matchMedia();
+            let navbarTween: gsap.core.Tween | null = null;
+            let frameId: number | null = null;
+            let lastScrollY = window.scrollY;
+            let navbarIsVisible = true;
+
+            const cancelScheduledUpdate = (): void => {
+              if (frameId !== null) {
+                window.cancelAnimationFrame(frameId);
+                frameId = null;
+              }
+            };
+
+            const resetNavbarTracking = (): void => {
+              cancelScheduledUpdate();
+              navbarTween?.kill();
+              navbarTween = null;
+              navbarIsVisible = true;
+              lastScrollY = window.scrollY;
+              // A transform on the header would contain fixed drawer descendants.
+              gsap.set(navbar, { clearProps: "transform" });
+            };
+
+            const handleMenuOpened = (): void => {
+              resetNavbarTracking();
+            };
+
+            const handleMenuClosed = (): void => {
+              resetNavbarTracking();
+            };
+
+            navbar.addEventListener("mobile-menu:opened", handleMenuOpened);
+            navbar.addEventListener("mobile-menu:closed", handleMenuClosed);
+
+            media.add(
+              {
+                isDesktop: DESKTOP_MEDIA_QUERY,
+                isMobile: MOBILE_MEDIA_QUERY,
+                reduceMotion: "(prefers-reduced-motion: reduce)",
+              },
+              (context) => {
+                const isDesktop = context.conditions?.isDesktop === true;
+                const isMobile = context.conditions?.isMobile === true;
+                const reduceMotion = context.conditions?.reduceMotion === true;
+
+                resetNavbarTracking();
+
+                if ((!isDesktop && !isMobile) || reduceMotion) {
+                  return;
+                }
+
+                const updateNavbar = (): void => {
+                  frameId = null;
+
+                  const currentScrollY = window.scrollY;
+
+                  if (navbar.dataset.mobileMenuState === "open") {
+                    resetNavbarTracking();
+                    return;
+                  }
+
+                  const shouldShow =
+                    currentScrollY <= lastScrollY ||
+                    currentScrollY <= NAVBAR_SCROLL_TOP_THRESHOLD;
+
+                  if (shouldShow !== navbarIsVisible) {
+                    navbarIsVisible = shouldShow;
+                    navbarTween = gsap.to(navbar, {
+                      yPercent: shouldShow ? 0 : -100,
+                      duration: 0.28,
+                      ease: "power2.out",
+                      overwrite: "auto",
+                    });
+                  }
+
+                  lastScrollY = currentScrollY;
+                };
+
+                const handleScroll = (): void => {
+                  if (frameId === null) {
+                    frameId = window.requestAnimationFrame(updateNavbar);
+                  }
+                };
+
+                window.addEventListener("scroll", handleScroll, {
+                  passive: true,
+                });
+
+                return (): void => {
+                  window.removeEventListener("scroll", handleScroll);
+                  resetNavbarTracking();
+                };
+              },
+            );
+
+            const cleanup = (): void => {
+              media.revert();
+              navbar.removeEventListener("mobile-menu:opened", handleMenuOpened);
+              navbar.removeEventListener("mobile-menu:closed", handleMenuClosed);
+              document.removeEventListener("astro:before-swap", cleanup);
+              navbar.dataset.navbarScrollInitialized = "false";
+            };
+
+            document.addEventListener("astro:before-swap", cleanup, {
+              once: true,
+            });
+          });
+      };
+
       const ACTIVE_LINK_ATTRIBUTE = "aria-current";
       const ACTIVE_LINK_VALUE = "location";
 
@@ -541,6 +664,7 @@ const links = [
       };
 
       initMobileMenu();
+      initNavbarScrollAnimation();
       initActiveSectionTracking();
     </script>
   </aside>
