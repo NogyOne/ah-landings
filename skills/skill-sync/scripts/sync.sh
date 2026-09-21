@@ -7,7 +7,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: sync.sh [--dry-run] [--scope root|halisco-landing]
+Usage: sync.sh [--dry-run] [--scope root|halisco-landing|api]
 
 Discover workspace skills, validate metadata.scope, and update only the managed
 Skills tables in the selected AGENTS.md files.
@@ -48,14 +48,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 case "$selected_scope" in
-  ""|root|halisco-landing) ;;
-  *) fail "unknown scope '$selected_scope'; expected root or halisco-landing" ;;
+  ""|root|halisco-landing|api) ;;
+  *) fail "unknown scope '$selected_scope'; expected root, halisco-landing, or api" ;;
 esac
 
 agents_path() {
   case "$1" in
     root) printf '%s/AGENTS.md\n' "$workspace_root" ;;
     halisco-landing) printf '%s/apps/halisco-landing/AGENTS.md\n' "$workspace_root" ;;
+    api) printf '%s/apps/api/AGENTS.md\n' "$workspace_root" ;;
     *) return 1 ;;
   esac
 }
@@ -66,6 +67,7 @@ catalog_path() {
   case "$scope" in
     root) printf 'skills/%s/SKILL.md\n' "$skill_name" ;;
     halisco-landing) printf '../../skills/%s/SKILL.md\n' "$skill_name" ;;
+    api) printf '../../skills/%s/SKILL.md\n' "$skill_name" ;;
     *) return 1 ;;
   esac
 }
@@ -169,7 +171,7 @@ while IFS= read -r skill_file; do
     parsed_scope="${parsed_scope#\'}"
     parsed_scope="${parsed_scope%\'}"
     case "$parsed_scope" in
-      root|halisco-landing) ;;
+      root|halisco-landing|api) ;;
       *) fail "unknown scope '$parsed_scope' in $skill_file" ;;
     esac
     case "|$normalized_scopes|" in
@@ -270,7 +272,7 @@ abort_apply() {
   exit 1
 }
 
-scopes="root halisco-landing"
+scopes="root halisco-landing api"
 [[ -z "$selected_scope" ]] || scopes="$selected_scope"
 changed=0
 render_plan="$temporary_dir/render-plan"

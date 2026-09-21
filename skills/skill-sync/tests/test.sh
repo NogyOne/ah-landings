@@ -40,7 +40,7 @@ assert_not_contains() {
 }
 
 workspace="$test_root/workspace"
-mkdir -p "$workspace/skills/skill-sync/scripts" "$workspace/skills/z-source" "$workspace/skills/a-source" "$workspace/apps/halisco-landing"
+mkdir -p "$workspace/skills/skill-sync/scripts" "$workspace/skills/z-source" "$workspace/skills/a-source" "$workspace/skills/api-alpha-source" "$workspace/skills/api-zeta-source" "$workspace/apps/halisco-landing" "$workspace/apps/api"
 "$real_cp" "$sync_script" "$workspace/skills/skill-sync/scripts/sync.sh"
 
 cat > "$workspace/AGENTS.md" <<'EOF'
@@ -59,6 +59,15 @@ Before nested marker.
 stale nested table
 <!-- skill-sync:end -->
 After nested marker.
+EOF
+
+cat > "$workspace/apps/api/AGENTS.md" <<'EOF'
+# API guide
+Before API marker.
+<!-- skill-sync:start -->
+stale API table
+<!-- skill-sync:end -->
+After API marker.
 EOF
 
 cat > "$workspace/skills/z-source/SKILL.md" <<'EOF'
@@ -82,18 +91,53 @@ metadata:
 ---
 EOF
 
+cat > "$workspace/skills/api-alpha-source/SKILL.md" <<'EOF'
+---
+name: api-alpha-skill
+description: "Trigger: API alpha work."
+metadata:
+  scope: [api]
+---
+EOF
+
+cat > "$workspace/skills/api-zeta-source/SKILL.md" <<'EOF'
+---
+name: api-zeta-skill
+description: >
+  Trigger: API zeta work.
+  Folded description.
+metadata:
+  scope:
+    - api
+---
+EOF
+
+run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run --scope unsupported
+assert_status 2
+assert_contains "$output" "unknown scope 'unsupported'"
+
 run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run
 assert_status 0
 assert_contains "$output" 'Would update: AGENTS.md'
 assert_contains "$output" 'Would update: apps/halisco-landing/AGENTS.md'
+assert_contains "$output" 'Would update: apps/api/AGENTS.md'
 assert_contains "$output" '[SKILL.md](skills/alpha-skill/SKILL.md)'
 assert_contains "$output" '[SKILL.md](../../skills/alpha-skill/SKILL.md)'
+assert_contains "$output" '[SKILL.md](../../skills/api-alpha-skill/SKILL.md)'
 assert_not_contains "$output" '../../skills/zeta-skill/SKILL.md'
+
+run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run --scope api
+assert_status 0
+assert_contains "$output" 'Scopes: api'
+assert_contains "$output" 'Would update: apps/api/AGENTS.md'
+assert_not_contains "$output" 'Would update: AGENTS.md'
+assert_not_contains "$output" 'Would update: apps/halisco-landing/AGENTS.md'
 
 run_capture "$workspace/skills/skill-sync/scripts/sync.sh"
 assert_status 0
 root_catalog="$(<"$workspace/AGENTS.md")"
 nested_catalog="$(<"$workspace/apps/halisco-landing/AGENTS.md")"
+api_catalog="$(<"$workspace/apps/api/AGENTS.md")"
 assert_contains "$root_catalog" 'Before root marker.'
 assert_contains "$root_catalog" 'After root marker.'
 assert_contains "$nested_catalog" 'Before nested marker.'
@@ -102,18 +146,32 @@ assert_contains "$root_catalog" 'Trigger: alpha work. Folded description.'
 assert_contains "$root_catalog" '[SKILL.md](skills/zeta-skill/SKILL.md)'
 assert_contains "$nested_catalog" '[SKILL.md](../../skills/alpha-skill/SKILL.md)'
 assert_not_contains "$nested_catalog" 'zeta-skill'
+assert_contains "$api_catalog" 'Before API marker.'
+assert_contains "$api_catalog" 'After API marker.'
+assert_contains "$api_catalog" '[SKILL.md](../../skills/api-alpha-skill/SKILL.md)'
+assert_contains "$api_catalog" 'Trigger: API zeta work. Folded description.'
+assert_not_contains "$root_catalog" 'api-alpha-skill'
+assert_not_contains "$root_catalog" 'api-zeta-skill'
+assert_not_contains "$nested_catalog" 'api-alpha-skill'
+assert_not_contains "$nested_catalog" 'api-zeta-skill'
 case "$root_catalog" in
   *'`alpha-skill`'*'`zeta-skill`'*) ;;
   *) printf 'Skills are not sorted by name:\n%s\n' "$root_catalog" >&2; exit 1 ;;
 esac
+case "$api_catalog" in
+  *'`api-alpha-skill`'*'`api-zeta-skill`'*) ;;
+  *) printf 'API skills are not sorted by name:\n%s\n' "$api_catalog" >&2; exit 1 ;;
+esac
 
 "$real_cp" "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
 "$real_cp" "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
+"$real_cp" "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run
 assert_status 0
 assert_contains "$output" 'Changed files: 0'
 cmp -s "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
 cmp -s "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
+cmp -s "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 
 mkdir -p "$workspace/skills/invalid-scope"
 cat > "$workspace/skills/invalid-scope/SKILL.md" <<'EOF'
@@ -129,6 +187,7 @@ assert_status 2
 assert_contains "$output" "unknown scope 'unsupported'"
 cmp -s "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
 cmp -s "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
+cmp -s "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 rm -rf -- "$workspace/skills/invalid-scope"
 
 cat > "$workspace/skills/z-source/SKILL.md" <<'EOF'
@@ -156,5 +215,6 @@ assert_contains "$output" 'apply failed:'
 assert_contains "$output" 'Rolled back: AGENTS.md'
 cmp -s "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
 cmp -s "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
+cmp -s "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 
 printf 'skill-sync tests: PASS\n'
