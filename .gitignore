@@ -26,3 +26,6 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+
+# Local ODD workflow documents (not a project convention yet)
+odd/
