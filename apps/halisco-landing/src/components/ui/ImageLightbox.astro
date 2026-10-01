@@ -276,6 +276,7 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const finalizeClose = (): void => {
+          closeButton.removeAttribute("data-initial-pointer-focus");
           restoreActiveSource();
           gsap.set(backdrop, { autoAlpha: 0 });
 
@@ -289,6 +290,7 @@ const { images, id = "image-lightbox" } = Astro.props;
 
         const close = (): void => {
           if (!dialog.open) {
+            closeButton.removeAttribute("data-initial-pointer-focus");
             restoreFocus();
             return;
           }
@@ -362,8 +364,10 @@ const { images, id = "image-lightbox" } = Astro.props;
 
           const reduceMotion = prefersReducedMotion();
           const sourceFrame = reduceMotion ? null : getSourceFrame(index);
+          const showFocusRing = restoreTarget?.matches(":focus-visible") === true;
 
           setActiveIndex(index);
+          closeButton.toggleAttribute("data-initial-pointer-focus", !showFocusRing);
 
           if (!dialog.open) {
             dialog.showModal();
@@ -451,6 +455,7 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const handleKeydown = (event: KeyboardEvent): void => {
+          closeButton.removeAttribute("data-initial-pointer-focus");
           if (!dialog.open) {
             return;
           }
@@ -472,6 +477,7 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const handleClose = (): void => {
+          closeButton.removeAttribute("data-initial-pointer-focus");
           restoreFocus();
         };
 
@@ -506,6 +512,7 @@ const { images, id = "image-lightbox" } = Astro.props;
           }
 
           restoreActiveSource();
+          closeButton.removeAttribute("data-initial-pointer-focus");
           slides.forEach((slide) => {
             const image = slide.querySelector<HTMLElement>(
               "[data-lightbox-target-id]",
@@ -553,3 +560,9 @@ const { images, id = "image-lightbox" } = Astro.props;
 
   initLightboxes();
 </script>
+
+<style>
+  [data-lightbox-close][data-initial-pointer-focus]:focus-visible {
+    outline: none;
+  }
+</style>

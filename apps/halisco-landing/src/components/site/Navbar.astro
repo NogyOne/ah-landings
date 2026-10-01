@@ -295,7 +295,8 @@ const links = [
               mainElement = null;
             };
 
-            const focusFirstMenuLink = (): void => {
+            const focusFirstMenuLink = (showFocusRing: boolean): void => {
+              links[0]?.toggleAttribute("data-initial-pointer-focus", !showFocusRing);
               window.requestAnimationFrame(() => {
                 if (navbar.dataset.mobileMenuState === "open") {
                   links[0]?.focus({ preventScroll: true });
@@ -321,7 +322,7 @@ const links = [
               lockMainContent();
               setMenuState(navbar, panel, overlay, toggleButton, morphIcon, "open");
               dispatchMenuEvent(navbar, "open");
-              focusFirstMenuLink();
+              focusFirstMenuLink(toggleButton.matches(":focus-visible"));
             };
 
             const closeMenu = (restoreFocus = true): void => {
@@ -330,6 +331,7 @@ const links = [
               }
 
               const focusIsInsidePanel = panel.contains(document.activeElement);
+              links[0]?.removeAttribute("data-initial-pointer-focus");
               setMenuState(navbar, panel, overlay, toggleButton, morphIcon, "closed");
               unlockPageScroll();
               restoreMainContent();
@@ -349,6 +351,8 @@ const links = [
             };
 
             const handleMenuKeydown = (event: KeyboardEvent): void => {
+              links[0]?.removeAttribute("data-initial-pointer-focus");
+
               if (
                 event.key === "Escape" &&
                 navbar.dataset.mobileMenuState === "open"
@@ -670,6 +674,10 @@ const links = [
   </aside>
 
   <style>
+    [data-mobile-menu-link][data-initial-pointer-focus]:focus-visible {
+      outline: none;
+    }
+
     .nav-link {
       position: relative;
     }
