@@ -97,11 +97,11 @@ const mapsUrl =
       <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <Button
           href={mapsUrl}
-          class="min-w-0 flex-1 px-2 text-[10px] md:flex-none md:px-5 md:text-xs"
+          class="visit-action w-full px-5 sm:w-auto"
           label="CÓMO LLEGAR"
         />
         <Button
-          class="min-w-0 flex-1 px-2 text-[10px] md:flex-none md:px-5 md:text-xs"
+          class="visit-action w-full px-5 sm:w-auto"
           label="ESCRIBIR POR WHATSAPP"
           href="https://wa.me/526871908152"
           variant="secondary"
@@ -164,6 +164,10 @@ const mapsUrl =
 </SectionContainer>
 
 <style is:global>
+  #visit .visit-action {
+    font-size: 0.875rem;
+  }
+
   [data-halisco-map].leaflet-container {
     background: #0d0d0c;
     font-family: var(--font-body);
@@ -194,11 +198,19 @@ const mapsUrl =
   }
 
   [data-halisco-map] .leaflet-control-attribution {
-    background: rgb(13 13 12 / 82%);
+    padding: 1px 4px;
+    background: rgb(13 13 12 / 80%);
     color: var(--color-theme-muted);
+    font-size: 11px;
+    line-height: 1.4;
   }
 
   [data-halisco-map] .leaflet-control-attribution a {
+    color: #bcb5ae;
+  }
+
+  [data-halisco-map] .leaflet-control-attribution a:hover,
+  [data-halisco-map] .leaflet-control-attribution a:focus-visible {
     color: var(--color-theme-accent);
   }
 
@@ -323,6 +335,7 @@ const mapsUrl =
               scrollWheelZoom: false,
               attributionControl: true,
             });
+            map.attributionControl.setPrefix(false);
 
             L.control
               .zoom({
