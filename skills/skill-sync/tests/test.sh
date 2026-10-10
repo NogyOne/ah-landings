@@ -40,7 +40,7 @@ assert_not_contains() {
 }
 
 workspace="$test_root/workspace"
-mkdir -p "$workspace/skills/skill-sync/scripts" "$workspace/skills/z-source" "$workspace/skills/a-source" "$workspace/skills/api-alpha-source" "$workspace/skills/api-zeta-source" "$workspace/apps/halisco-landing" "$workspace/apps/api"
+mkdir -p "$workspace/skills/skill-sync/scripts" "$workspace/skills/z-source" "$workspace/skills/a-source" "$workspace/skills/api-alpha-source" "$workspace/skills/api-zeta-source" "$workspace/skills/web-source" "$workspace/apps/halisco-landing" "$workspace/apps/api" "$workspace/apps/no-markers" "$workspace/apps/web-app"
 "$real_cp" "$sync_script" "$workspace/skills/skill-sync/scripts/sync.sh"
 
 cat > "$workspace/AGENTS.md" <<'EOF'
@@ -68,6 +68,30 @@ Before API marker.
 stale API table
 <!-- skill-sync:end -->
 After API marker.
+EOF
+
+cat > "$workspace/apps/no-markers/AGENTS.md" <<'EOF'
+# No markers guide
+Nothing managed here.
+EOF
+"$real_cp" "$workspace/apps/no-markers/AGENTS.md" "$test_root/no-markers-original"
+
+cat > "$workspace/apps/web-app/AGENTS.md" <<'EOF'
+# Web app guide
+Before web marker.
+<!-- skill-sync:start -->
+stale web table
+<!-- skill-sync:end -->
+After web marker.
+EOF
+
+cat > "$workspace/skills/web-source/SKILL.md" <<'EOF'
+---
+name: web-skill
+description: "Trigger: web app work."
+metadata:
+  scope: [web-app]
+---
 EOF
 
 cat > "$workspace/skills/z-source/SKILL.md" <<'EOF'
@@ -116,8 +140,16 @@ run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run --scope uns
 assert_status 2
 assert_contains "$output" "unknown scope 'unsupported'"
 
+run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run --scope no-markers
+assert_status 2
+assert_contains "$output" "unknown scope 'no-markers'"
+
 run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run
 assert_status 0
+assert_contains "$output" 'Scopes: root api halisco-landing web-app'
+assert_contains "$output" 'Would update: apps/web-app/AGENTS.md'
+assert_contains "$output" '[SKILL.md](../../skills/web-skill/SKILL.md)'
+assert_not_contains "$output" 'no-markers/AGENTS.md'
 assert_contains "$output" 'Would update: AGENTS.md'
 assert_contains "$output" 'Would update: apps/halisco-landing/AGENTS.md'
 assert_contains "$output" 'Would update: apps/api/AGENTS.md'
@@ -150,6 +182,12 @@ assert_contains "$api_catalog" 'Before API marker.'
 assert_contains "$api_catalog" 'After API marker.'
 assert_contains "$api_catalog" '[SKILL.md](../../skills/api-alpha-skill/SKILL.md)'
 assert_contains "$api_catalog" 'Trigger: API zeta work. Folded description.'
+web_catalog="$(<"$workspace/apps/web-app/AGENTS.md")"
+assert_contains "$web_catalog" 'Before web marker.'
+assert_contains "$web_catalog" '[SKILL.md](../../skills/web-skill/SKILL.md)'
+assert_not_contains "$web_catalog" 'alpha-skill'
+assert_not_contains "$root_catalog" 'web-skill'
+cmp -s "$workspace/apps/no-markers/AGENTS.md" "$test_root/no-markers-original"
 assert_not_contains "$root_catalog" 'api-alpha-skill'
 assert_not_contains "$root_catalog" 'api-zeta-skill'
 assert_not_contains "$nested_catalog" 'api-alpha-skill'
@@ -189,6 +227,20 @@ cmp -s "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
 cmp -s "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
 cmp -s "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 rm -rf -- "$workspace/skills/invalid-scope"
+
+mkdir -p "$workspace/skills/markerless-scope"
+cat > "$workspace/skills/markerless-scope/SKILL.md" <<'EOF'
+---
+name: markerless-scope
+description: "Trigger: scope without markers."
+metadata:
+  scope: [no-markers]
+---
+EOF
+run_capture "$workspace/skills/skill-sync/scripts/sync.sh"
+assert_status 2
+assert_contains "$output" "unknown scope 'no-markers'"
+rm -rf -- "$workspace/skills/markerless-scope"
 
 cat > "$workspace/skills/z-source/SKILL.md" <<'EOF'
 ---

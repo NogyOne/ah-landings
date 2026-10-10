@@ -58,7 +58,7 @@ Do not claim or run `astro check`: `@astrojs/check` and TypeScript are not decla
 | --- | --- | --- |
 | `appledouble-cleanup` | Trigger: AppleDouble cleanup, ._* files, macOS sidecars. Safely scan or remove narrow AppleDouble artifacts. | [SKILL.md](../../skills/appledouble-cleanup/SKILL.md) |
 | `astro-static-landing` | Trigger: Astro landing pages, .astro components, static rendering, client islands, astro:assets. Build lean static Halisco experiences. | [SKILL.md](../../skills/astro-static-landing/SKILL.md) |
-| `docs-alignment` | Trigger: documentation change, workflow change, architecture docs. Keep documentation aligned with current workspace behavior. | [SKILL.md](../../skills/docs-alignment/SKILL.md) |
+| `docs-alignment` | Trigger: documentation change, workflow change, architecture docs, README, contributor guidance. Keep documentation aligned with current behavior in the workspace and its applications. | [SKILL.md](../../skills/docs-alignment/SKILL.md) |
 | `gsap-core` | Trigger: GSAP core, gsap.to(), gsap.from(), gsap.fromTo(), easing, stagger, matchMedia. Apply framework-agnostic tween patterns with responsive and reduced-motion support. | [SKILL.md](../../skills/gsap-core/SKILL.md) |
 | `gsap-performance` | Trigger: GSAP performance, jank, FPS, smooth animation, will-change, quickTo. Optimize transforms, batching, and animation cleanup for responsive Halisco interfaces. | [SKILL.md](../../skills/gsap-performance/SKILL.md) |
 | `gsap-plugins` | Trigger: GSAP plugins, Flip, FLIP animation, registerPlugin, shared-element transition. Register GSAP plugins and apply Flip layout transitions safely. | [SKILL.md](../../skills/gsap-plugins/SKILL.md) |
@@ -67,7 +67,7 @@ Do not claim or run `astro check`: `@astrojs/check` and TypeScript are not decla
 | `gsap-utils` | Trigger: gsap.utils, clamp, mapRange, normalize, interpolate, random, snap, toArray, wrap, pipe. Apply GSAP utility helpers safely. | [SKILL.md](../../skills/gsap-utils/SKILL.md) |
 | `open-pencil` | Trigger: OpenPencil, .fig design, design inspection, design mutation. Use the configured MCP safely for Halisco design work. | [SKILL.md](../../skills/open-pencil/SKILL.md) |
 | `seo-geo` | Trigger: SEO audit, GEO audit, technical SEO, local SEO, structured data, hreflang, robots.txt, sitemap, metadata, AI search. Audit, apply, and verify evidence-based search quality without invented facts or ranking promises. | [SKILL.md](../../skills/seo-geo/SKILL.md) |
-| `typescript` | Trigger: TypeScript, .ts, Astro component types, strict typing. Apply safe TypeScript patterns in Halisco components. | [SKILL.md](../../skills/typescript/SKILL.md) |
+| `typescript` | Trigger: TypeScript, .ts, .tsx, types, interfaces, generics, const maps, type guards, removing any, tightening unknown. Apply strict TypeScript patterns when implementing or refactoring typed code. | [SKILL.md](../../skills/typescript/SKILL.md) |
 <!-- skill-sync:end -->
 
 ## Skill Loading Rule

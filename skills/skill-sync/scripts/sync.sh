@@ -7,10 +7,13 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: sync.sh [--dry-run] [--scope root|halisco-landing|api]
+Usage: sync.sh [--dry-run] [--scope <name>]
 
 Discover workspace skills, validate metadata.scope, and update only the managed
 Skills tables in the selected AGENTS.md files.
+
+Valid scopes are discovered: "root" (AGENTS.md) plus every apps/<app>/AGENTS.md
+that contains the skill-sync:start and skill-sync:end markers (scope = <app>).
 EOF
 }
 
@@ -47,29 +50,57 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-case "$selected_scope" in
-  ""|root|halisco-landing|api) ;;
-  *) fail "unknown scope '$selected_scope'; expected root, halisco-landing, or api" ;;
-esac
+marker_pattern_start='<!--[[:space:]]*skill-sync:start[[:space:]]*-->'
+marker_pattern_end='<!--[[:space:]]*skill-sync:end[[:space:]]*-->'
 
-agents_path() {
-  case "$1" in
-    root) printf '%s/AGENTS.md\n' "$workspace_root" ;;
-    halisco-landing) printf '%s/apps/halisco-landing/AGENTS.md\n' "$workspace_root" ;;
-    api) printf '%s/apps/api/AGENTS.md\n' "$workspace_root" ;;
+has_markers() {
+  grep -Eq -- "$marker_pattern_start" "$1" && grep -Eq -- "$marker_pattern_end" "$1"
+}
+
+discover_scopes() {
+  local candidate
+  printf 'root\n'
+  for candidate in "$workspace_root"/apps/*/AGENTS.md; do
+    [[ -f "$candidate" ]] || continue
+    has_markers "$candidate" || continue
+    basename -- "$(dirname -- "$candidate")"
+  done | LC_ALL=C sort -u
+}
+
+discovered_scopes="$(discover_scopes | tr '\n' ' ')"
+discovered_scopes="${discovered_scopes% }"
+
+is_valid_scope() {
+  case " $discovered_scopes " in
+    *" $1 "*) return 0 ;;
     *) return 1 ;;
   esac
+}
+
+if [[ -n "$selected_scope" ]] && ! is_valid_scope "$selected_scope"; then
+  fail "unknown scope '$selected_scope'; expected one of: ${discovered_scopes// /, }"
+fi
+
+agents_path() {
+  if [[ "$1" == root ]]; then
+    printf '%s/AGENTS.md\n' "$workspace_root"
+  elif is_valid_scope "$1"; then
+    printf '%s/apps/%s/AGENTS.md\n' "$workspace_root" "$1"
+  else
+    return 1
+  fi
 }
 
 catalog_path() {
   local scope="$1"
   local skill_name="$2"
-  case "$scope" in
-    root) printf 'skills/%s/SKILL.md\n' "$skill_name" ;;
-    halisco-landing) printf '../../skills/%s/SKILL.md\n' "$skill_name" ;;
-    api) printf '../../skills/%s/SKILL.md\n' "$skill_name" ;;
-    *) return 1 ;;
-  esac
+  if [[ "$scope" == root ]]; then
+    printf 'skills/%s/SKILL.md\n' "$skill_name"
+  elif is_valid_scope "$scope"; then
+    printf '../../skills/%s/SKILL.md\n' "$skill_name"
+  else
+    return 1
+  fi
 }
 
 extract_field() {
@@ -170,10 +201,7 @@ while IFS= read -r skill_file; do
     parsed_scope="${parsed_scope%\"}"
     parsed_scope="${parsed_scope#\'}"
     parsed_scope="${parsed_scope%\'}"
-    case "$parsed_scope" in
-      root|halisco-landing|api) ;;
-      *) fail "unknown scope '$parsed_scope' in $skill_file" ;;
-    esac
+    is_valid_scope "$parsed_scope" || fail "unknown scope '$parsed_scope' in $skill_file (discovered: ${discovered_scopes// /, })"
     case "|$normalized_scopes|" in
       *"|$parsed_scope|"*) fail "duplicate scope '$parsed_scope' in $skill_file" ;;
     esac
@@ -272,7 +300,7 @@ abort_apply() {
   exit 1
 }
 
-scopes="root halisco-landing api"
+scopes="$discovered_scopes"
 [[ -z "$selected_scope" ]] || scopes="$selected_scope"
 changed=0
 render_plan="$temporary_dir/render-plan"
