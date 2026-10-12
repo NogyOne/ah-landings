@@ -4,8 +4,8 @@ description: "Trigger: documentation change, workflow change, architecture docs,
 license: Apache-2.0
 metadata:
   author: "nerdy-cloud"
-  version: "2.0"
-  scope: [root, halisco-landing, api, ah-client]
+  version: "2.1"
+  scope: [root, halisco-landing, api, ah-client, domain]
   auto_invoke:
     - "Changing behavior, setup, commands, architecture, or contributor workflow"
     - "Creating or reviewing workspace or application documentation"
