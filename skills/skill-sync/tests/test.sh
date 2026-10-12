@@ -40,7 +40,7 @@ assert_not_contains() {
 }
 
 workspace="$test_root/workspace"
-mkdir -p "$workspace/skills/skill-sync/scripts" "$workspace/skills/z-source" "$workspace/skills/a-source" "$workspace/skills/api-alpha-source" "$workspace/skills/api-zeta-source" "$workspace/skills/web-source" "$workspace/apps/halisco-landing" "$workspace/apps/api" "$workspace/apps/no-markers" "$workspace/apps/web-app"
+mkdir -p "$workspace/skills/skill-sync/scripts" "$workspace/skills/z-source" "$workspace/skills/a-source" "$workspace/skills/api-alpha-source" "$workspace/skills/api-zeta-source" "$workspace/skills/web-source" "$workspace/apps/halisco-landing" "$workspace/apps/api" "$workspace/apps/no-markers" "$workspace/apps/web-app" "$workspace/packages/shared-pkg" "$workspace/packages/pkg-no-markers"
 "$real_cp" "$sync_script" "$workspace/skills/skill-sync/scripts/sync.sh"
 
 cat > "$workspace/AGENTS.md" <<'EOF'
@@ -83,6 +83,29 @@ Before web marker.
 stale web table
 <!-- skill-sync:end -->
 After web marker.
+EOF
+
+cat > "$workspace/packages/shared-pkg/AGENTS.md" <<'EOF'
+# Package guide
+Before package marker.
+<!-- skill-sync:start -->
+stale package table
+<!-- skill-sync:end -->
+After package marker.
+EOF
+
+cat > "$workspace/packages/pkg-no-markers/AGENTS.md" <<'EOF'
+# Package without markers
+EOF
+
+mkdir -p "$workspace/skills/pkg-source"
+cat > "$workspace/skills/pkg-source/SKILL.md" <<'EOF'
+---
+name: pkg-skill
+description: "Trigger: package work."
+metadata:
+  scope: [shared-pkg]
+---
 EOF
 
 cat > "$workspace/skills/web-source/SKILL.md" <<'EOF'
@@ -144,12 +167,18 @@ run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run --scope no-
 assert_status 2
 assert_contains "$output" "unknown scope 'no-markers'"
 
+run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run --scope pkg-no-markers
+assert_status 2
+assert_contains "$output" "unknown scope 'pkg-no-markers'"
+
 run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run
 assert_status 0
-assert_contains "$output" 'Scopes: root api halisco-landing web-app'
+assert_contains "$output" 'Scopes: root api halisco-landing shared-pkg web-app'
 assert_contains "$output" 'Would update: apps/web-app/AGENTS.md'
 assert_contains "$output" '[SKILL.md](../../skills/web-skill/SKILL.md)'
 assert_not_contains "$output" 'no-markers/AGENTS.md'
+assert_contains "$output" 'Would update: packages/shared-pkg/AGENTS.md'
+assert_contains "$output" '[SKILL.md](../../skills/pkg-skill/SKILL.md)'
 assert_contains "$output" 'Would update: AGENTS.md'
 assert_contains "$output" 'Would update: apps/halisco-landing/AGENTS.md'
 assert_contains "$output" 'Would update: apps/api/AGENTS.md'
@@ -186,6 +215,11 @@ web_catalog="$(<"$workspace/apps/web-app/AGENTS.md")"
 assert_contains "$web_catalog" 'Before web marker.'
 assert_contains "$web_catalog" '[SKILL.md](../../skills/web-skill/SKILL.md)'
 assert_not_contains "$web_catalog" 'alpha-skill'
+pkg_catalog="$(<"$workspace/packages/shared-pkg/AGENTS.md")"
+assert_contains "$pkg_catalog" 'Before package marker.'
+assert_contains "$pkg_catalog" '[SKILL.md](../../skills/pkg-skill/SKILL.md)'
+assert_not_contains "$pkg_catalog" 'alpha-skill'
+assert_not_contains "$root_catalog" 'pkg-skill'
 assert_not_contains "$root_catalog" 'web-skill'
 cmp -s "$workspace/apps/no-markers/AGENTS.md" "$test_root/no-markers-original"
 assert_not_contains "$root_catalog" 'api-alpha-skill'
@@ -241,6 +275,20 @@ run_capture "$workspace/skills/skill-sync/scripts/sync.sh"
 assert_status 2
 assert_contains "$output" "unknown scope 'no-markers'"
 rm -rf -- "$workspace/skills/markerless-scope"
+
+mkdir -p "$workspace/apps/dup" "$workspace/packages/dup"
+for dup_guide in "$workspace/apps/dup/AGENTS.md" "$workspace/packages/dup/AGENTS.md"; do
+  cat > "$dup_guide" <<'EOF'
+# Duplicate scope guide
+<!-- skill-sync:start -->
+<!-- skill-sync:end -->
+EOF
+done
+run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run
+assert_status 2
+assert_contains "$output" 'scope name used by both an app and a package: dup'
+cmp -s "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
+rm -rf -- "$workspace/apps/dup" "$workspace/packages/dup"
 
 cat > "$workspace/skills/z-source/SKILL.md" <<'EOF'
 ---

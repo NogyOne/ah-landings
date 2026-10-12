@@ -13,7 +13,8 @@ Discover workspace skills, validate metadata.scope, and update only the managed
 Skills tables in the selected AGENTS.md files.
 
 Valid scopes are discovered: "root" (AGENTS.md) plus every apps/<app>/AGENTS.md
-that contains the skill-sync:start and skill-sync:end markers (scope = <app>).
+and packages/<pkg>/AGENTS.md that contains the skill-sync:start and
+skill-sync:end markers (scope = the <app> or <pkg> directory name).
 EOF
 }
 
@@ -57,16 +58,22 @@ has_markers() {
   grep -Eq -- "$marker_pattern_start" "$1" && grep -Eq -- "$marker_pattern_end" "$1"
 }
 
-discover_scopes() {
+discover_scopes_raw() {
   local candidate
-  printf 'root\n'
-  for candidate in "$workspace_root"/apps/*/AGENTS.md; do
+  for candidate in "$workspace_root"/apps/*/AGENTS.md "$workspace_root"/packages/*/AGENTS.md; do
     [[ -f "$candidate" ]] || continue
     has_markers "$candidate" || continue
     basename -- "$(dirname -- "$candidate")"
-  done | LC_ALL=C sort -u
+  done
 }
 
+discover_scopes() {
+  printf 'root\n'
+  discover_scopes_raw | LC_ALL=C sort -u
+}
+
+duplicate_scopes="$(discover_scopes_raw | LC_ALL=C sort | uniq -d | tr '\n' ' ')"
+[[ -z "$duplicate_scopes" ]] || fail "scope name used by both an app and a package: ${duplicate_scopes% }"
 discovered_scopes="$(discover_scopes | tr '\n' ' ')"
 discovered_scopes="${discovered_scopes% }"
 
@@ -84,8 +91,10 @@ fi
 agents_path() {
   if [[ "$1" == root ]]; then
     printf '%s/AGENTS.md\n' "$workspace_root"
-  elif is_valid_scope "$1"; then
+  elif [[ -f "$workspace_root/apps/$1/AGENTS.md" ]] && is_valid_scope "$1"; then
     printf '%s/apps/%s/AGENTS.md\n' "$workspace_root" "$1"
+  elif [[ -f "$workspace_root/packages/$1/AGENTS.md" ]] && is_valid_scope "$1"; then
+    printf '%s/packages/%s/AGENTS.md\n' "$workspace_root" "$1"
   else
     return 1
   fi
