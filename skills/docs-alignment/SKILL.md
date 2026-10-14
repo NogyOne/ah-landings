@@ -5,7 +5,7 @@ license: Apache-2.0
 metadata:
   author: "nerdy-cloud"
   version: "2.1"
-  scope: [root, halisco-landing, api, ah-client, domain]
+  scope: [root, halisco-landing]
   auto_invoke:
     - "Changing behavior, setup, commands, architecture, or contributor workflow"
     - "Creating or reviewing workspace or application documentation"

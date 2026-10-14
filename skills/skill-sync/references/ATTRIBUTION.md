@@ -6,4 +6,4 @@ This skill preserves the Prowler `skill-sync` source record and Apache-2.0 licen
 - Upstream author: `prowler-cloud`
 - License: Apache-2.0
 
-This implementation limits routing to `root` and `halisco-landing`, validates every declared scope, and updates only marked Skills table content.
+This implementation limits routing to `root` and to every app or package `AGENTS.md` that opts in with skill-sync markers, validates every declared scope, and updates only marked Skills table content.

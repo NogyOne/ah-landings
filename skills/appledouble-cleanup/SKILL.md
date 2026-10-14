@@ -5,7 +5,7 @@ license: Apache-2.0
 metadata:
   author: "nerdy-cloud"
   version: "1.0"
-  scope: [root, halisco-landing, api, ah-client]
+  scope: [root, halisco-landing]
   auto_invoke:
     - "Scanning the workspace for macOS AppleDouble sidecars"
     - "Diagnosing loader failures caused by resource sidecars"

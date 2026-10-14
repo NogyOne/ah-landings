@@ -40,7 +40,7 @@ assert_not_contains() {
 }
 
 workspace="$test_root/workspace"
-mkdir -p "$workspace/skills/skill-sync/scripts" "$workspace/skills/z-source" "$workspace/skills/a-source" "$workspace/skills/api-alpha-source" "$workspace/skills/api-zeta-source" "$workspace/skills/web-source" "$workspace/apps/halisco-landing" "$workspace/apps/api" "$workspace/apps/no-markers" "$workspace/apps/web-app" "$workspace/packages/shared-pkg" "$workspace/packages/pkg-no-markers"
+mkdir -p "$workspace/skills/skill-sync/scripts" "$workspace/skills/z-source" "$workspace/skills/a-source" "$workspace/skills/api-alpha-source" "$workspace/skills/api-zeta-source" "$workspace/skills/web-source" "$workspace/apps/nested-app" "$workspace/apps/api" "$workspace/apps/no-markers" "$workspace/apps/web-app" "$workspace/packages/shared-pkg" "$workspace/packages/pkg-no-markers"
 "$real_cp" "$sync_script" "$workspace/skills/skill-sync/scripts/sync.sh"
 
 cat > "$workspace/AGENTS.md" <<'EOF'
@@ -52,8 +52,8 @@ stale root table
 After root marker.
 EOF
 
-cat > "$workspace/apps/halisco-landing/AGENTS.md" <<'EOF'
-# Halisco guide
+cat > "$workspace/apps/nested-app/AGENTS.md" <<'EOF'
+# Nested app guide
 Before nested marker.
 <!-- skill-sync:start -->
 stale nested table
@@ -124,7 +124,7 @@ description: >
   Trigger: alpha work.
   Folded description.
 metadata:
-  scope: [root, "halisco-landing"]
+  scope: [root, "nested-app"]
 ---
 EOF
 
@@ -173,14 +173,14 @@ assert_contains "$output" "unknown scope 'pkg-no-markers'"
 
 run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run
 assert_status 0
-assert_contains "$output" 'Scopes: root api halisco-landing shared-pkg web-app'
+assert_contains "$output" 'Scopes: root api nested-app shared-pkg web-app'
 assert_contains "$output" 'Would update: apps/web-app/AGENTS.md'
 assert_contains "$output" '[SKILL.md](../../skills/web-skill/SKILL.md)'
 assert_not_contains "$output" 'no-markers/AGENTS.md'
 assert_contains "$output" 'Would update: packages/shared-pkg/AGENTS.md'
 assert_contains "$output" '[SKILL.md](../../skills/pkg-skill/SKILL.md)'
 assert_contains "$output" 'Would update: AGENTS.md'
-assert_contains "$output" 'Would update: apps/halisco-landing/AGENTS.md'
+assert_contains "$output" 'Would update: apps/nested-app/AGENTS.md'
 assert_contains "$output" 'Would update: apps/api/AGENTS.md'
 assert_contains "$output" '[SKILL.md](skills/alpha-skill/SKILL.md)'
 assert_contains "$output" '[SKILL.md](../../skills/alpha-skill/SKILL.md)'
@@ -192,12 +192,12 @@ assert_status 0
 assert_contains "$output" 'Scopes: api'
 assert_contains "$output" 'Would update: apps/api/AGENTS.md'
 assert_not_contains "$output" 'Would update: AGENTS.md'
-assert_not_contains "$output" 'Would update: apps/halisco-landing/AGENTS.md'
+assert_not_contains "$output" 'Would update: apps/nested-app/AGENTS.md'
 
 run_capture "$workspace/skills/skill-sync/scripts/sync.sh"
 assert_status 0
 root_catalog="$(<"$workspace/AGENTS.md")"
-nested_catalog="$(<"$workspace/apps/halisco-landing/AGENTS.md")"
+nested_catalog="$(<"$workspace/apps/nested-app/AGENTS.md")"
 api_catalog="$(<"$workspace/apps/api/AGENTS.md")"
 assert_contains "$root_catalog" 'Before root marker.'
 assert_contains "$root_catalog" 'After root marker.'
@@ -236,13 +236,13 @@ case "$api_catalog" in
 esac
 
 "$real_cp" "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
-"$real_cp" "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
+"$real_cp" "$workspace/apps/nested-app/AGENTS.md" "$test_root/nested-after-first-apply"
 "$real_cp" "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 run_capture "$workspace/skills/skill-sync/scripts/sync.sh" --dry-run
 assert_status 0
 assert_contains "$output" 'Changed files: 0'
 cmp -s "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
-cmp -s "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
+cmp -s "$workspace/apps/nested-app/AGENTS.md" "$test_root/nested-after-first-apply"
 cmp -s "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 
 mkdir -p "$workspace/skills/invalid-scope"
@@ -258,7 +258,7 @@ run_capture "$workspace/skills/skill-sync/scripts/sync.sh"
 assert_status 2
 assert_contains "$output" "unknown scope 'unsupported'"
 cmp -s "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
-cmp -s "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
+cmp -s "$workspace/apps/nested-app/AGENTS.md" "$test_root/nested-after-first-apply"
 cmp -s "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 rm -rf -- "$workspace/skills/invalid-scope"
 
@@ -295,14 +295,14 @@ cat > "$workspace/skills/z-source/SKILL.md" <<'EOF'
 name: alpha-skill
 description: "Trigger: alpha work. Changed for rollback."
 metadata:
-  scope: [root, halisco-landing]
+  scope: [root, nested-app]
 ---
 EOF
 fake_bin="$test_root/fake-bin"
 mkdir -p "$fake_bin"
 cat > "$fake_bin/cp" <<'EOF'
 #!/usr/bin/env bash
-if [[ "${2:-}" == */updated-halisco-landing && "${3:-}" == */apps/halisco-landing/AGENTS.md ]]; then
+if [[ "${2:-}" == */updated-nested-app && "${3:-}" == */apps/nested-app/AGENTS.md ]]; then
   exit 73
 fi
 exec "$REAL_CP" "$@"
@@ -314,7 +314,7 @@ run_capture env PATH="$fake_bin:$PATH" REAL_CP="$real_cp" "$workspace/skills/ski
 assert_contains "$output" 'apply failed:'
 assert_contains "$output" 'Rolled back: AGENTS.md'
 cmp -s "$workspace/AGENTS.md" "$test_root/root-after-first-apply"
-cmp -s "$workspace/apps/halisco-landing/AGENTS.md" "$test_root/nested-after-first-apply"
+cmp -s "$workspace/apps/nested-app/AGENTS.md" "$test_root/nested-after-first-apply"
 cmp -s "$workspace/apps/api/AGENTS.md" "$test_root/api-after-first-apply"
 
 printf 'skill-sync tests: PASS\n'

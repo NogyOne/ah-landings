@@ -5,7 +5,7 @@ license: Apache-2.0
 metadata:
   author: "nerdy-cloud"
   version: "1.1-ah.2"
-  scope: [halisco-landing, api, ah-client, domain]
+  scope: [halisco-landing]
   auto_invoke:
     - "Implementing or refactoring TypeScript in .ts/.tsx files"
     - "Tightening types, interfaces, generics, or const maps"
