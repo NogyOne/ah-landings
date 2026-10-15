@@ -27,7 +27,7 @@ An Aurus landing is planned; the `aurus-web` commit scope is reserved for it. No
 - Keep cross-project architecture and conventions in `docs/`.
 - Create `decisions/`, `patterns/`, `runbooks/`, or acceptance documentation only when real content exists.
 - Do not describe planned topology as current behavior.
-- The Halisco site deploys as the Cloudflare Worker `halisco-web` (`apps/halisco-landing/wrangler.jsonc`); the Git-connected build uses `apps/halisco-landing` as its root directory, so keep that path and the worker name stable.
+- The Halisco site deploys as the Cloudflare Worker `halisco-landing` (`apps/halisco-landing/wrangler.jsonc`); the Git-connected build uses `apps/halisco-landing` as its root directory, so keep that path and the worker name stable.
 
 ## Git Conventions
 

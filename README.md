@@ -8,7 +8,7 @@ The internal system (API, internal client, shared domain package) lives in a sep
 
 | Application | Status | Purpose |
 | --- | --- | --- |
-| [Halisco Landing](apps/halisco-landing/) | Active | Astro customer-facing landing, deployed as the Cloudflare Worker `halisco-web` |
+| [Halisco Landing](apps/halisco-landing/) | Active | Astro customer-facing landing, deployed as the Cloudflare Worker `halisco-landing` |
 
 An Aurus landing is planned but does not exist yet.
 

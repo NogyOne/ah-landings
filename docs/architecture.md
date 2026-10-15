@@ -18,7 +18,7 @@ Root documentation links to application-owned detail instead of restating it.
 
 | Path | Current state | Local ownership |
 | --- | --- | --- |
-| `apps/halisco-landing/` | Active Astro application, deployed as the Cloudflare Worker `halisco-web` | Local `AGENTS.md` and `docs/` |
+| `apps/halisco-landing/` | Active Astro application, deployed as the Cloudflare Worker `halisco-landing` | Local `AGENTS.md` and `docs/` |
 | `docs/` | Active workspace documentation | Root-owned shared facts and conventions |
 | `skills/` | Active shared agent skills | Root-owned and metadata-routed |
 
