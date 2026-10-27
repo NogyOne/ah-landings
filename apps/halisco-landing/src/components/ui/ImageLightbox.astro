@@ -141,6 +141,7 @@ const { images, id = "image-lightbox" } = Astro.props;
 <script>
   import { gsap } from "gsap";
   import { Flip } from "gsap/Flip";
+  import { bindLightboxSwipe } from "@/scripts/lightbox-swipe";
 
   gsap.registerPlugin(Flip);
 
@@ -206,6 +207,7 @@ const { images, id = "image-lightbox" } = Astro.props;
         let restoreTarget: HTMLElement | null = null;
         let activeTransition: gsap.core.Timeline | null = null;
         let activeSource: HTMLElement | null = null;
+        let isClosing = false;
 
         const galleryRoot = dialog.closest<HTMLElement>("[data-work-gallery]");
         const carouselViewport = galleryRoot?.querySelector<HTMLElement>(
@@ -289,6 +291,8 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const close = (): void => {
+          isClosing = true;
+          swipe.reset();
           if (!dialog.open) {
             closeButton.removeAttribute("data-initial-pointer-focus");
             restoreFocus();
@@ -356,6 +360,8 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const open = (index: number): void => {
+          swipe.reset();
+          isClosing = false;
           restoreTarget =
             document.activeElement instanceof HTMLElement
               ? document.activeElement
@@ -454,6 +460,13 @@ const { images, id = "image-lightbox" } = Astro.props;
           setActiveIndex(activeIndex + 1);
         };
 
+        const swipe = bindLightboxSwipe(stage, {
+          isEnabled: () => dialog.open && !isClosing,
+          getScale: () => window.visualViewport?.scale ?? 1,
+          previous: handlePrevious,
+          next: handleNext,
+        });
+
         const handleKeydown = (event: KeyboardEvent): void => {
           closeButton.removeAttribute("data-initial-pointer-focus");
           if (!dialog.open) {
@@ -477,6 +490,7 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const handleClose = (): void => {
+          swipe.reset();
           closeButton.removeAttribute("data-initial-pointer-focus");
           restoreFocus();
         };
@@ -506,6 +520,7 @@ const { images, id = "image-lightbox" } = Astro.props;
         };
 
         const cleanup = (): void => {
+          swipe.destroy();
           if (activeTransition) {
             activeTransition.kill();
             activeTransition = null;
@@ -562,6 +577,10 @@ const { images, id = "image-lightbox" } = Astro.props;
 </script>
 
 <style>
+  [data-lightbox-stage] {
+    touch-action: pan-y pinch-zoom;
+  }
+
   [data-lightbox-close][data-initial-pointer-focus]:focus-visible {
     outline: none;
   }
