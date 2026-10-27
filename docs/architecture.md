@@ -1,6 +1,6 @@
 # Workspace Architecture
 
-AH Landings is a coordination workspace for the public landing applications of the AH ecosystem. Dependencies are installed through one pnpm workspace: `pnpm-workspace.yaml` includes `apps/*`, and the root `pnpm-lock.yaml` is the only lockfile. There is no root `package.json` or root script, so each application keeps its own commands. The internal system lives in a separate repository: <https://github.com/NogyOne/ah-system>.
+AH Landings is a coordination workspace for the public landing applications of the AH ecosystem. Dependencies are installed through one pnpm workspace: `pnpm-workspace.yaml` includes `apps/*`, and the root `pnpm-lock.yaml` is the only lockfile. The private root `package.json` declares the workspace package-manager pin; it has no scripts or dependencies, so each application keeps its own commands. The internal system lives in a separate repository: <https://github.com/NogyOne/ah-system>.
 
 ## Ownership Model
 

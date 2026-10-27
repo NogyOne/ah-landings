@@ -14,7 +14,7 @@ An Aurus landing is planned but does not exist yet.
 
 ## Working in an Application
 
-Run `pnpm install` once at the root: it is a pnpm workspace with a single lockfile. There are no root scripts, so enter the application and use its local commands. Halisco work follows [its agent guide](apps/halisco-landing/AGENTS.md) and [documentation index](apps/halisco-landing/docs/README.md).
+The private root `package.json` pins pnpm to `12.15.0` for this workspace. Run `pnpm install --frozen-lockfile` at the root to install the versions recorded in the shared lockfile. There are no root scripts, so enter the application and use its local commands. Halisco work follows [its agent guide](apps/halisco-landing/AGENTS.md) and [documentation index](apps/halisco-landing/docs/README.md).
 
 ## Repository Structure
 
