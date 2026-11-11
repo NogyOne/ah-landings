@@ -72,6 +72,13 @@ package.json               # Runtime, dependency, and package-script contract
 
 Use the narrowest established alias for imports. Dependency declarations and package-script ownership remain in `package.json`.
 
+## Search Foundation
+
+- `astro.config.mjs` sets the production origin to `https://joyeriahalisco.com/`; `BaseLayout.astro` emits an absolute canonical from that origin and the page pathname. `index.astro` owns the Spanish homepage title and description.
+- `public/robots.txt`, `public/sitemap.xml`, and `public/llms.txt` are static passthrough files. The manual sitemap lists only the homepage; update it when indexable routes change. Keep its URLs and factual llms content aligned with the page. llms.txt is project policy, not a Google ranking requirement.
+- JSON-LD and social cards/images are deliberately deferred pending owner approval. Local source configuration does not configure DNS, HTTPS redirects, Search Console, or the deployed robots policy.
+- After `pnpm build`, run `node --test tests/seo-foundation.test.mjs` to inspect generated metadata, discovery files, links, and factual consistency. The check uses Node's test runner and Python 3's standard-library HTML/XML parsers; it does not install dependencies or verify deployment/indexing.
+
 ## Documentation Boundaries
 
 - This document is implementation truth for architecture, ownership, structure, configuration, and runtime boundaries.
