@@ -8,12 +8,47 @@ import FAQSection from "@sections/FAQSection.astro";
 import VisitSection from "@sections/VisitSection.astro";
 import WorkGallerySection from "@sections/WorkGallerySection.astro";
 import WorkmanshipSection from "@sections/WorkmanshipSection.astro";
+
+const business = {
+  "@context": "https://schema.org",
+  "@type": "JewelryStore",
+  "@id": new URL("#store", Astro.site).href,
+  name: "Joyería Halisco",
+  url: new URL("/", Astro.site).href,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Vicente Guerrero 575, Centro",
+    addressLocality: "Guasave",
+    addressRegion: "Sinaloa",
+    postalCode: "81000",
+    addressCountry: "MX",
+  },
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    opens: "10:00",
+    closes: "19:00",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 25.5611903,
+    longitude: -108.4632454,
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "WhatsApp",
+    telephone: "+526871908152",
+    url: "https://wa.me/526871908152",
+  },
+};
+const businessJson = JSON.stringify(business).replace(/</g, "\\u003c");
 ---
 
 <BaseLayout
-	title="Joyería Halisco en Guasave | Oro, plata y reparaciones"
-	description="Joyería Halisco en Guasave, Sinaloa: joyas de oro y plata, hechuras propias, reparaciones y servicios de relojería. Visítanos en Vicente Guerrero 575, Centro."
+	title="Joyería Halisco en Guasave | Oro y reparaciones"
+	description="Prendas de oro, reparaciones, hechuras propias y servicios de relojería en Joyería Halisco, Guasave, Sinaloa. Visítanos o cotiza por WhatsApp."
 >
+    <script slot="head" type="application/ld+json" set:html={businessJson} />
 		<main id="main-content">
 			<HeroSection />
 			<JewelrySection />
