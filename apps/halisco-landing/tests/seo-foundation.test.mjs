@@ -72,7 +72,7 @@ test("built homepage has approved metadata and exactly one clean absolute canoni
   assert.deepEqual(page.titles, ["Joyería Halisco en Guasave | Oro y reparaciones"]);
   const descriptions = page.metas.filter((meta) => meta.name === "description");
   assert.deepEqual(descriptions.map((meta) => meta.content), [
-    "Prendas de oro, reparaciones, hechuras propias y servicios de relojería en Joyería Halisco, Guasave, Sinaloa. Visítanos o cotiza por WhatsApp.",
+    "Venta de prendas de oro, hechuras propias, reparaciones y servicios de relojería en Joyería Halisco, Guasave, Sinaloa. Visítanos o cotiza por WhatsApp.",
   ]);
   const canonicals = page.links.filter((link) => link.rel === "canonical");
   assert.deepEqual(canonicals.map((link) => link.href), [origin]);
